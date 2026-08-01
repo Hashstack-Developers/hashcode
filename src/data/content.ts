@@ -14,6 +14,7 @@ export const navLinks = [
   { href: "/services", label: "Services" },
   { href: "/work", label: "Work" },
   { href: "/about", label: "About" },
+  { href: "/play", label: "Play" },
   { href: "/contact", label: "Contact" },
 ];
 

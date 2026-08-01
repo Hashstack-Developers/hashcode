@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import Lenis from "lenis";
 import { gsap, ScrollTrigger, registerGsap } from "@/lib/gsap";
 import { isMobileViewport } from "@/lib/mobile";
+import { scrollTopDurationSec, slowScrollToTop } from "@/lib/scrollTop";
 
 /**
  * Desktop: Lenis smooth scroll + ScrollTrigger sync.
@@ -32,6 +33,11 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
     };
 
     if (mobile) {
+      const onScrollTop = () => {
+        slowScrollToTop();
+      };
+      window.addEventListener("hashstack:scroll-top", onScrollTop);
+
       const onDone = () => {
         // One settle pass after loader + fonts — avoid a refresh storm
         hardRefresh();
@@ -55,6 +61,7 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
         window.clearTimeout(refreshTimer);
         window.removeEventListener("hashstack:loader-done", onDone);
         window.removeEventListener("orientationchange", onOrient);
+        window.removeEventListener("hashstack:scroll-top", onScrollTop);
       };
     }
 
@@ -81,9 +88,17 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
       window.setTimeout(() => ScrollTrigger.refresh(true), 400);
     };
     const lock = () => lenis.stop();
+    const onScrollTop = () => {
+      lenis.scrollTo(0, {
+        duration: scrollTopDurationSec(),
+        easing: (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2),
+        force: true,
+      });
+    };
 
     window.addEventListener("hashstack:loader-done", unlock);
     window.addEventListener("hashstack:loader-lock", lock);
+    window.addEventListener("hashstack:scroll-top", onScrollTop);
     const failsafe = window.setTimeout(unlock, 7000);
     const onResize = () => hardRefresh();
     window.addEventListener("resize", onResize);
@@ -93,6 +108,7 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
       window.clearTimeout(refreshTimer);
       window.removeEventListener("hashstack:loader-done", unlock);
       window.removeEventListener("hashstack:loader-lock", lock);
+      window.removeEventListener("hashstack:scroll-top", onScrollTop);
       window.removeEventListener("resize", onResize);
       gsap.ticker.remove(ticker);
       lenis.destroy();

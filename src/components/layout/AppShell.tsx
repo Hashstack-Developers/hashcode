@@ -7,6 +7,7 @@ import { CustomCursor } from "@/components/layout/CustomCursor";
 import { CuteBot } from "@/components/layout/CuteBot";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { ScrollToTop } from "@/components/layout/ScrollToTop";
 import { isMobileViewport } from "@/lib/mobile";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -25,6 +26,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />
+        <ScrollToTop />
       </LenisProvider>
     </>
   );
