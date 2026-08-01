@@ -15,24 +15,46 @@ function unlockPage() {
   window.dispatchEvent(new Event("hashstack:loader-done"));
 }
 
+function forceRemoveLoaderDom() {
+  // Do not .remove() React-owned nodes — causes removeChild NotFoundError.
+  // Hide only; LoadingScreen unmounts via setDone(true).
+  document.querySelectorAll<HTMLElement>('[data-hashstack-loader="1"]').forEach((node) => {
+    node.style.display = "none";
+    node.style.pointerEvents = "none";
+    node.setAttribute("aria-hidden", "true");
+  });
+}
+
 function isMobileDevice() {
   if (typeof window === "undefined") return false;
   return window.matchMedia("(max-width: 768px), (pointer: coarse)").matches;
 }
 
 /**
- * Desktop: full walk → crouch → hammer → crack → split.
- * Mobile: shorter path + early Enter + soft/hard failsafes so it never sticks.
+ * Desktop: walk → slam → split.
+ * Mobile / LAN phones: skip gold cinema entirely — it was sticking as a blank yellow screen
+ * when GSAP/WebView hiccuped. Unlock immediately + hard failsafe.
  */
 export function LoadingScreen({ onComplete }: LoadingScreenProps) {
   const root = useRef<HTMLDivElement>(null);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
   const finished = useRef(false);
   const slamStarted = useRef(false);
-  const mobileRef = useRef(false);
   const [done, setDone] = useState(false);
+  /** Avoid SSR painting gold halves (blank yellow if JS is slow/broken on phones). */
+  const [client, setClient] = useState(false);
   const [phase, setPhase] = useState<"walk" | "slam" | "open">("walk");
   const [showEnter, setShowEnter] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  const finish = useCallback(() => {
+    if (finished.current) return;
+    finished.current = true;
+    unlockPage();
+    forceRemoveLoaderDom();
+    setDone(true);
+    onComplete?.();
+  }, [onComplete]);
 
   const complete = useCallback(() => {
     if (finished.current) return;
@@ -76,44 +98,48 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
 
     window.setTimeout(() => {
       unlockPage();
+      forceRemoveLoaderDom();
       setDone(true);
       onComplete?.();
-    }, mobileRef.current ? 700 : 900);
+    }, 750);
   }, [onComplete]);
 
+  // Client gate + mobile fast-path (no yellow overlay)
   useEffect(() => {
-    mobileRef.current = isMobileDevice();
-    const mobile = mobileRef.current;
+    const mobile = isMobileDevice();
+    setIsMobile(mobile);
+    setClient(true);
+
+    if (mobile) {
+      // Never lock scroll / paint gold on phones — was the blank yellow stuck state
+      finish();
+      return;
+    }
 
     document.documentElement.classList.add("overflow-hidden", "loader-locked");
     document.body.style.overflow = "hidden";
     document.body.style.touchAction = "none";
 
-    // Mobile: Enter early + soft force-open so it never sticks
-    const enterAt = mobile ? 900 : 1800;
-    const softAt = mobile ? 4200 : 9000;
-    const hardAt = mobile ? 6500 : 11000;
-
-    const enterTimer = window.setTimeout(() => setShowEnter(true), enterAt);
-    const soft = window.setTimeout(() => complete(), softAt);
-    const hard = window.setTimeout(() => complete(), hardAt);
+    const enterTimer = window.setTimeout(() => setShowEnter(true), 1800);
+    const soft = window.setTimeout(() => complete(), 9000);
+    const hard = window.setTimeout(() => finish(), 12000);
 
     return () => {
       window.clearTimeout(enterTimer);
       window.clearTimeout(soft);
       window.clearTimeout(hard);
     };
-  }, [complete]);
+  }, [complete, finish]);
 
+  // Desktop walk → slam
   useEffect(() => {
-    if (done || finished.current) return;
-    const walkMs = mobileRef.current || isMobileDevice() ? 1400 : 2200;
-    const walkDone = window.setTimeout(() => setPhase("slam"), walkMs);
+    if (!client || isMobile || done || finished.current) return;
+    const walkDone = window.setTimeout(() => setPhase("slam"), 2200);
     return () => window.clearTimeout(walkDone);
-  }, [done]);
+  }, [client, isMobile, done]);
 
   useEffect(() => {
-    if (done || finished.current || phase !== "slam") return;
+    if (!client || isMobile || done || finished.current || phase !== "slam") return;
     if (slamStarted.current) return;
     slamStarted.current = true;
 
@@ -132,11 +158,10 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
     const arm = el.querySelector<HTMLElement>(".robot-arm");
     const crack = el.querySelector<HTMLElement>(".loader-crack");
     const brand = el.querySelector<HTMLElement>(".loader-brand-row");
-    const mobile = mobileRef.current || isMobileDevice();
 
     if (!left || !right || !robot) {
       const retry = window.setTimeout(() => {
-        if (!finished.current) complete();
+        if (!finished.current) finish();
       }, 300);
       return () => window.clearTimeout(retry);
     }
@@ -144,10 +169,9 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
     robot.classList.remove("loader-robot-walking");
     robot.classList.add("loader-robot-center");
 
-    // Safety: if timeline never finishes (common on some mobile WebViews)
     const slamWatchdog = window.setTimeout(() => {
-      if (!finished.current) complete();
-    }, mobile ? 2800 : 4500);
+      if (!finished.current) finish();
+    }, 4500);
 
     try {
       gsap.set(robot, { clearProps: "transform", x: 0, y: 0, scale: 1, autoAlpha: 1 });
@@ -165,81 +189,53 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
       });
       tlRef.current = tl;
 
-      if (mobile) {
-        // Mobile: lighter timeline — fewer SVG transforms, still cinematic
-        tl.to(robotBody || robot, { y: 10, scaleY: 0.88, scaleX: 1.06, duration: 0.25, ease: "power2.in" })
-          .to(robotBody || robot, { y: -18, scaleY: 1.04, scaleX: 0.96, duration: 0.18, ease: "power2.out" })
-          .to(robotBody || robot, { y: 6, scaleY: 0.92, scaleX: 1.04, duration: 0.12, ease: "power3.in" });
-        if (arm) {
-          tl.to(arm, { rotation: -90, duration: 0.28, ease: "power2.in" }, 0).to(
-            arm,
-            { rotation: 50, duration: 0.12, ease: "power4.in" },
-            0.28,
-          );
-        }
-        if (crack) tl.to(crack, { scaleY: 1, autoAlpha: 1, duration: 0.28, ease: "power2.out" }, 0.35);
-        if (stage) {
-          tl.to(stage, { x: -10, duration: 0.04 }, "-=0.05")
-            .to(stage, { x: 10, duration: 0.04 })
-            .to(stage, { x: 0, duration: 0.06 });
-        }
-        if (brand) tl.to(brand, { autoAlpha: 1, duration: 0.25 });
-        tl.to(robot, { autoAlpha: 0, scale: 0.9, duration: 0.25 }).to({}, { duration: 0.12 });
-      } else {
-        // Desktop: full crouch → jump → hammer → crack → shake
-        tl.to(robotBody || robot, { scaleY: 0.82, scaleX: 1.08, y: 12, duration: 0.35, ease: "power2.in" });
-        if (arm) tl.to(arm, { rotation: -115, duration: 0.4, ease: "power2.in" }, "<");
-        tl.to(robotBody || robot, { scaleY: 1.05, scaleX: 0.95, y: -28, duration: 0.22, ease: "power2.out" });
-        if (arm) tl.to(arm, { rotation: 62, duration: 0.14, ease: "power4.in" }, "-=0.06");
-        tl.to(robotBody || robot, { scaleY: 0.88, scaleX: 1.06, y: 8, duration: 0.12, ease: "power3.in" }, "<");
-        if (crack) tl.to(crack, { scaleY: 1, autoAlpha: 1, duration: 0.38, ease: "power2.out" }, "-=0.02");
-        tl.to(robotBody || robot, { scaleY: 1, scaleX: 1, y: 0, duration: 0.28, ease: "power2.out" });
-        if (stage) {
-          tl.to(stage, {
-            keyframes: [
-              { x: -16, duration: 0.04 },
-              { x: 16, duration: 0.04 },
-              { x: -12, duration: 0.04 },
-              { x: 10, duration: 0.04 },
-              { x: -5, duration: 0.04 },
-              { x: 0, duration: 0.06 },
-            ],
-          });
-        }
-        if (brand) tl.to(brand, { autoAlpha: 1, duration: 0.3 });
-        tl.fromTo(".loader-left-word", { x: -28, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: 0.4 }, "<")
-          .fromTo(".loader-right-word", { x: 28, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: 0.4 }, "<")
-          .to(robot, { autoAlpha: 0, scale: 0.88, duration: 0.35 })
-          .to({}, { duration: 0.2 });
+      tl.to(robotBody || robot, { scaleY: 0.82, scaleX: 1.08, y: 12, duration: 0.35, ease: "power2.in" });
+      if (arm) tl.to(arm, { rotation: -115, duration: 0.4, ease: "power2.in" }, "<");
+      tl.to(robotBody || robot, { scaleY: 1.05, scaleX: 0.95, y: -28, duration: 0.22, ease: "power2.out" });
+      if (arm) tl.to(arm, { rotation: 62, duration: 0.14, ease: "power4.in" }, "-=0.06");
+      tl.to(robotBody || robot, { scaleY: 0.88, scaleX: 1.06, y: 8, duration: 0.12, ease: "power3.in" }, "<");
+      if (crack) tl.to(crack, { scaleY: 1, autoAlpha: 1, duration: 0.38, ease: "power2.out" }, "-=0.02");
+      tl.to(robotBody || robot, { scaleY: 1, scaleX: 1, y: 0, duration: 0.28, ease: "power2.out" });
+      if (stage) {
+        tl.to(stage, {
+          keyframes: [
+            { x: -16, duration: 0.04 },
+            { x: 16, duration: 0.04 },
+            { x: -12, duration: 0.04 },
+            { x: 10, duration: 0.04 },
+            { x: -5, duration: 0.04 },
+            { x: 0, duration: 0.06 },
+          ],
+        });
       }
+      if (brand) tl.to(brand, { autoAlpha: 1, duration: 0.3 });
+      tl.fromTo(".loader-left-word", { x: -28, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: 0.4 }, "<")
+        .fromTo(".loader-right-word", { x: 28, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: 0.4 }, "<")
+        .to(robot, { autoAlpha: 0, scale: 0.88, duration: 0.35 })
+        .to({}, { duration: 0.2 });
 
       return () => {
         window.clearTimeout(slamWatchdog);
         tl.kill();
         if (tlRef.current === tl) tlRef.current = null;
-        // If Strict Mode / navigation killed mid-slam, force open so mobile never sticks
-        if (!finished.current && mobile) {
-          window.setTimeout(() => {
-            if (!finished.current) complete();
-          }, 100);
-        }
       };
     } catch {
       window.clearTimeout(slamWatchdog);
-      complete();
+      finish();
       return;
     }
-  }, [phase, complete, done]);
+  }, [phase, complete, finish, done, client, isMobile]);
 
-  if (done) return null;
+  // SSR + mobile: never paint gold. Desktop: only after client mount.
+  if (done || !client || isMobile) return null;
 
   return (
     <div
       ref={root}
+      data-hashstack-loader="1"
       className="fixed inset-0 z-[100] overflow-hidden"
       aria-label="Loading Hashstack Developers"
       onClick={() => {
-        // Tap anywhere after Enter shows — skip stuck states on mobile
         if (showEnter) complete();
       }}
     >
@@ -267,11 +263,6 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
         }
         .loader-robot-walking {
           animation: hashstack-walk-in 2.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
-        @media (max-width: 768px) {
-          .loader-robot-walking {
-            animation-duration: 1.4s;
-          }
         }
         .loader-robot-walking .robot-leg-l {
           transform-box: fill-box;

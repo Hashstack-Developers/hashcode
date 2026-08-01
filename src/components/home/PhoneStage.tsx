@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { gsap, useGSAP, registerGsap } from "@/lib/gsap";
+import { pinDistance, pinExtras, scrubFeel } from "@/lib/mobile";
 import { Heart, MessageCircle, Send, Bookmark, MoreHorizontal, ThumbsUp, Share2, Play } from "lucide-react";
 
 type PostChapter = {
@@ -52,6 +53,10 @@ const POSTS: PostChapter[] = [
   },
 ];
 
+/**
+ * Desktop: phone cinema with side docks.
+ * Mobile: no side docks — chip row under phone + light slide cycle.
+ */
 export function PhoneStage() {
   const root = useRef<HTMLElement>(null);
 
@@ -60,132 +65,171 @@ export function PhoneStage() {
       registerGsap();
       if (!root.current) return;
 
-      gsap.set(".phone-rig", {
-        y: 140,
-        rotateX: 18,
-        rotateY: 14,
-        scale: 0.8,
-        autoAlpha: 0.35,
-      });
-      gsap.set(".phone-intro", { y: 24, autoAlpha: 0 });
-      gsap.set(".phone-glow", { opacity: 0 });
-      gsap.set(".phone-slide", { autoAlpha: 0, scale: 0.94 });
-      gsap.set(".phone-dock-item", { autoAlpha: 0, scale: 0.35, y: 18 });
-      gsap.set(".phone-fly", { autoAlpha: 0, scale: 0.3 });
-      gsap.set(".phone-print", { autoAlpha: 0, scale: 0, visibility: "hidden" });
-      gsap.set(".phone-outro", { autoAlpha: 0, y: 12 });
-      gsap.set(".design-layer", { autoAlpha: 0, scale: 0.85 });
+      const mm = gsap.matchMedia();
 
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: root.current,
-          start: "top top",
-          end: `+=${260 + POSTS.length * 95}%`,
-          scrub: 1.05,
-          pin: true,
-          anticipatePin: 1,
-        },
-      });
+      mm.add("(max-width: 767px)", () => {
+        gsap.set(".phone-rig", { y: 28, rotateX: 0, rotateY: 0, scale: 0.96, autoAlpha: 0.85 });
+        gsap.set(".phone-intro", { y: 14, autoAlpha: 0 });
+        gsap.set(".phone-glow", { opacity: 0.55 });
+        gsap.set(".phone-slide", { autoAlpha: 0, scale: 0.96 });
+        gsap.set(".design-layer", { autoAlpha: 1, scale: 1 });
+        gsap.set(".phone-mobile-chip", { y: 10, autoAlpha: 0 });
+        gsap.set(".phone-outro", { autoAlpha: 0, y: 8 });
 
-      tl.to(".phone-glow", { opacity: 1, duration: 0.5, ease: "none" }, 0)
-        .to(
-          ".phone-rig",
-          {
-            y: 0,
-            rotateX: 4,
-            rotateY: -2,
-            scale: 1,
-            autoAlpha: 1,
-            duration: 0.95,
-            ease: "none",
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: root.current,
+            start: "top top",
+            end: `+=${pinDistance(140 + POSTS.length * 40, 0.95)}%`,
+            scrub: scrubFeel(0.55),
+            pin: true,
+            ...pinExtras(),
           },
-          0,
-        )
-        .to(".phone-intro", { y: 0, autoAlpha: 1, duration: 0.45, ease: "none" }, 0.15);
+        });
 
-      let t = 1.0;
+        tl.to(".phone-intro", { y: 0, autoAlpha: 1, duration: 0.35, ease: "none" }, 0)
+          .to(".phone-rig", { y: 0, scale: 1, autoAlpha: 1, duration: 0.45, ease: "none" }, 0.05)
+          .to(".phone-mobile-chip", { y: 0, autoAlpha: 1, stagger: 0.05, duration: 0.3, ease: "none" }, 0.2);
 
-      POSTS.forEach((p, i) => {
-        const slide = `.phone-slide-${p.id}`;
-        const fly = `.phone-fly-${p.id}`;
-        const dock = `.phone-dock-${p.id}`;
-        const prints = `.phone-print-${p.id}`;
+        let t = 0.5;
+        POSTS.forEach((p, i) => {
+          const slide = `.phone-slide-${p.id}`;
+          const prev = i > 0 ? `.phone-slide-${POSTS[i - 1].id}` : null;
+          if (prev) tl.to(prev, { autoAlpha: 0, scale: 0.96, duration: 0.2, ease: "none" }, t);
+          tl.to(slide, { autoAlpha: 1, scale: 1, duration: 0.3, ease: "none" }, t + 0.05)
+            .to(`.phone-mchip-${p.id}`, { scale: 1.05, duration: 0.18, ease: "none" }, t + 0.08)
+            .to(`.phone-mchip-${p.id}`, { scale: 1, duration: 0.22, ease: "none" }, t + 0.4);
+          t += 0.75;
+        });
 
-        tl.to(slide, { autoAlpha: 1, scale: 1, duration: 0.35, ease: "none" }, t);
+        tl.to(".phone-outro", { autoAlpha: 1, y: 0, duration: 0.3, ease: "none" }, t);
+      });
 
-        // Design layers build for graphics chapter
-        if (p.kind === "design") {
-          tl.to(
-            `${slide} .design-layer`,
-            { autoAlpha: 1, scale: 1, stagger: 0.12, duration: 0.28, ease: "none" },
-            t + 0.15,
-          );
-        }
+      mm.add("(min-width: 768px)", () => {
+        gsap.set(".phone-rig", {
+          y: 140,
+          rotateX: 18,
+          rotateY: 14,
+          scale: 0.8,
+          autoAlpha: 0.35,
+        });
+        gsap.set(".phone-intro", { y: 24, autoAlpha: 0 });
+        gsap.set(".phone-glow", { opacity: 0 });
+        gsap.set(".phone-slide", { autoAlpha: 0, scale: 0.94 });
+        gsap.set(".phone-dock-item", { autoAlpha: 0, scale: 0.35, y: 18 });
+        gsap.set(".phone-fly", { autoAlpha: 0, scale: 0.3 });
+        gsap.set(".phone-print", { autoAlpha: 0, scale: 0, visibility: "hidden" });
+        gsap.set(".phone-outro", { autoAlpha: 0, y: 12 });
+        gsap.set(".design-layer", { autoAlpha: 0, scale: 0.85 });
 
-        tl.fromTo(
-          prints,
-          { autoAlpha: 0, scale: 0.3, visibility: "visible" },
-          {
-            autoAlpha: 1,
-            scale: 1.15,
-            stagger: 0.04,
-            duration: 0.18,
-            ease: "none",
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: root.current,
+            start: "top top",
+            end: `+=${pinDistance(260 + POSTS.length * 95)}%`,
+            scrub: 1.05,
+            pin: true,
+            ...pinExtras(),
           },
-          t + 0.45,
-        )
-          .to(
-            prints,
-            { autoAlpha: 0, scale: 0, duration: 0.28, ease: "none" },
-            t + 0.78,
-          )
-          .set(prints, { autoAlpha: 0, scale: 0, visibility: "hidden" }, t + 1.08)
-          .set(
-            fly,
-            {
-              autoAlpha: 1,
-              scale: 1.05,
-              left: "50%",
-              top: "50%",
-              xPercent: -50,
-              yPercent: -50,
-              rotation: p.side === "left" ? -10 : 10,
-            },
-            t + 0.48,
-          )
-          .to(
-            fly,
-            {
-              left: p.side === "left" ? "8%" : "92%",
-              top: `${24 + (i % 2) * 24}%`,
-              scale: 0.72,
-              rotation: 0,
-              duration: 0.55,
-              ease: "none",
-            },
-            t + 0.48,
-          )
-          .to(slide, { autoAlpha: 0, scale: 0.95, duration: 0.3, ease: "none" }, t + 0.7)
-          .to(dock, { autoAlpha: 1, scale: 1, y: 0, duration: 0.4, ease: "none" }, t + 0.9)
-          .to(fly, { autoAlpha: 0, duration: 0.2, ease: "none" }, t + 1.0)
+        });
+
+        tl.to(".phone-glow", { opacity: 1, duration: 0.5, ease: "none" }, 0)
           .to(
             ".phone-rig",
             {
-              rotateY: p.side === "left" ? 8 : -8,
-              duration: 0.35,
+              y: 0,
+              rotateX: 4,
+              rotateY: -2,
+              scale: 1,
+              autoAlpha: 1,
+              duration: 0.95,
               ease: "none",
             },
-            t + 0.4,
-          );
+            0,
+          )
+          .to(".phone-intro", { y: 0, autoAlpha: 1, duration: 0.45, ease: "none" }, 0.15);
 
-        t += 1.35;
+        let t = 1.0;
+
+        POSTS.forEach((p, i) => {
+          const slide = `.phone-slide-${p.id}`;
+          const fly = `.phone-fly-${p.id}`;
+          const dock = `.phone-dock-${p.id}`;
+          const prints = `.phone-print-${p.id}`;
+
+          tl.to(slide, { autoAlpha: 1, scale: 1, duration: 0.35, ease: "none" }, t);
+
+          if (p.kind === "design") {
+            tl.to(
+              `${slide} .design-layer`,
+              { autoAlpha: 1, scale: 1, stagger: 0.12, duration: 0.28, ease: "none" },
+              t + 0.15,
+            );
+          }
+
+          tl.fromTo(
+            prints,
+            { autoAlpha: 0, scale: 0.3, visibility: "visible" },
+            {
+              autoAlpha: 1,
+              scale: 1.15,
+              stagger: 0.04,
+              duration: 0.18,
+              ease: "none",
+            },
+            t + 0.45,
+          )
+            .to(prints, { autoAlpha: 0, scale: 0, duration: 0.28, ease: "none" }, t + 0.78)
+            .set(prints, { autoAlpha: 0, scale: 0, visibility: "hidden" }, t + 1.08)
+            .set(
+              fly,
+              {
+                autoAlpha: 1,
+                scale: 1.05,
+                left: "50%",
+                top: "50%",
+                xPercent: -50,
+                yPercent: -50,
+                rotation: p.side === "left" ? -10 : 10,
+              },
+              t + 0.48,
+            )
+            .to(
+              fly,
+              {
+                left: p.side === "left" ? "8%" : "92%",
+                top: `${24 + (i % 2) * 24}%`,
+                scale: 0.72,
+                rotation: 0,
+                duration: 0.55,
+                ease: "none",
+              },
+              t + 0.48,
+            )
+            .to(slide, { autoAlpha: 0, scale: 0.95, duration: 0.3, ease: "none" }, t + 0.7)
+            .to(dock, { autoAlpha: 1, scale: 1, y: 0, duration: 0.4, ease: "none" }, t + 0.9)
+            .to(fly, { autoAlpha: 0, duration: 0.2, ease: "none" }, t + 1.0)
+            .to(
+              ".phone-rig",
+              {
+                rotateY: p.side === "left" ? 8 : -8,
+                duration: 0.35,
+                ease: "none",
+              },
+              t + 0.4,
+            );
+
+          t += 1.35;
+        });
+
+        tl.to(".phone-rig", { rotateY: 0, scale: 0.96, duration: 0.5, ease: "none" }, t).to(
+          ".phone-outro",
+          { autoAlpha: 1, y: 0, duration: 0.35, ease: "none" },
+          t,
+        );
       });
 
-      tl.to(".phone-rig", { rotateY: 0, scale: 0.96, duration: 0.5, ease: "none" }, t).to(
-        ".phone-outro",
-        { autoAlpha: 1, y: 0, duration: 0.35, ease: "none" },
-        t,
-      );
+      return () => mm.revert();
     },
     { scope: root },
   );
@@ -201,16 +245,15 @@ export function PhoneStage() {
       }}
       aria-label="Creative graphics ads posts"
     >
-      <div className="relative flex min-h-[100svh] flex-col items-center justify-center gap-5 overflow-hidden px-2 pb-16 pt-28 md:gap-7 md:px-6 md:pb-20 md:pt-32">
+      <div className="relative flex min-h-[100svh] flex-col items-center justify-center gap-4 overflow-hidden px-4 pb-14 pt-16 md:gap-7 md:px-6 md:pb-20 md:pt-32">
         <div
-          className="phone-glow pointer-events-none absolute left-1/2 top-[55%] h-[50vmin] w-[40vmin] -translate-x-1/2 -translate-y-1/2 rounded-full"
+          className="phone-glow pointer-events-none absolute left-1/2 top-[50%] h-[50vmin] w-[40vmin] -translate-x-1/2 -translate-y-1/2 rounded-full"
           style={{
-            background:
-              "radial-gradient(circle, rgba(202,138,4,0.22) 0%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(202,138,4,0.22) 0%, transparent 70%)",
           }}
         />
 
-        <div className="phone-intro relative z-30 w-full max-w-lg shrink-0 px-4 text-center">
+        <div className="phone-intro relative z-30 w-full max-w-lg shrink-0 px-2 text-center">
           <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.4em] text-[#8a6a20]">
             Creative desk
           </p>
@@ -220,66 +263,66 @@ export function PhoneStage() {
           <p className="mt-2 text-sm text-[#5c4a28]">Design → publish — watch it land.</p>
         </div>
 
-        <div className="pointer-events-none absolute inset-y-0 left-1 z-20 flex w-[108px] flex-col justify-center gap-7 md:left-5 md:w-[148px] md:gap-8 lg:left-7 lg:w-[168px]">
+        {/* Desktop docks only */}
+        <div className="pointer-events-none absolute inset-y-0 left-5 z-20 hidden w-[148px] flex-col justify-center gap-8 md:flex lg:left-7 lg:w-[168px]">
           {POSTS.filter((p) => p.side === "left").map((p) => (
             <PhoneDock key={p.id} post={p} />
           ))}
         </div>
-        <div className="pointer-events-none absolute inset-y-0 right-1 z-20 flex w-[108px] flex-col justify-center gap-7 md:right-5 md:w-[148px] md:gap-8 lg:right-7 lg:w-[168px]">
+        <div className="pointer-events-none absolute inset-y-0 right-5 z-20 hidden w-[148px] flex-col justify-center gap-8 md:flex lg:right-7 lg:w-[168px]">
           {POSTS.filter((p) => p.side === "right").map((p) => (
             <PhoneDock key={p.id} post={p} />
           ))}
         </div>
 
-        {/* Footprints */}
-        {POSTS.map((p, ci) => (
-          <div key={`trail-${p.id}`} className="pointer-events-none absolute inset-0 z-30">
-            {Array.from({ length: FOOTPRINTS }).map((_, fi) => {
-              const prog = (fi + 1) / (FOOTPRINTS + 1);
-              const left = p.side === "left" ? 50 - prog * 38 : 50 + prog * 38;
-              const top = 50 + Math.sin(prog * Math.PI) * (ci % 2 === 0 ? -5 : 5) - prog * 6;
-              return (
-                <span
-                  key={fi}
-                  className={`phone-print phone-print-${p.id} absolute -translate-x-1/2 -translate-y-1/2 rounded-full`}
-                  style={{
-                    left: `${left}%`,
-                    top: `${top}%`,
-                    width: fi % 2 === 0 ? 5 : 8,
-                    height: fi % 2 === 0 ? 5 : 8,
-                    background: GOLD,
-                    boxShadow: `0 0 12px ${GOLD}, 0 0 22px rgba(245,215,110,0.7)`,
-                    visibility: "hidden",
-                  }}
-                />
-              );
-            })}
-          </div>
-        ))}
+        <div className="pointer-events-none absolute inset-0 z-30 hidden md:block">
+          {POSTS.map((p, ci) => (
+            <div key={`trail-${p.id}`} className="absolute inset-0">
+              {Array.from({ length: FOOTPRINTS }).map((_, fi) => {
+                const prog = (fi + 1) / (FOOTPRINTS + 1);
+                const left = p.side === "left" ? 50 - prog * 38 : 50 + prog * 38;
+                const top = 50 + Math.sin(prog * Math.PI) * (ci % 2 === 0 ? -5 : 5) - prog * 6;
+                return (
+                  <span
+                    key={fi}
+                    className={`phone-print phone-print-${p.id} absolute -translate-x-1/2 -translate-y-1/2 rounded-full`}
+                    style={{
+                      left: `${left}%`,
+                      top: `${top}%`,
+                      width: fi % 2 === 0 ? 5 : 8,
+                      height: fi % 2 === 0 ? 5 : 8,
+                      background: GOLD,
+                      boxShadow: `0 0 12px ${GOLD}, 0 0 22px rgba(245,215,110,0.7)`,
+                      visibility: "hidden",
+                    }}
+                  />
+                );
+              })}
+            </div>
+          ))}
+          {POSTS.map((p) => (
+            <div
+              key={`fly-${p.id}`}
+              className={`phone-fly phone-fly-${p.id} absolute z-40 flex h-24 w-24 items-center justify-center rounded-[1.5rem] border-2 border-[#ca8a04]/50`}
+              style={{
+                background: "linear-gradient(145deg, #2a241c 0%, #0a0a0a 100%)",
+                boxShadow: `0 0 28px ${GOLD}88`,
+                left: "50%",
+                top: "50%",
+              }}
+            >
+              <span className="font-[family-name:var(--font-display)] text-2xl font-extrabold text-[#faf8f0]">
+                {p.mark}
+              </span>
+            </div>
+          ))}
+        </div>
 
-        {POSTS.map((p) => (
-          <div
-            key={`fly-${p.id}`}
-            className={`phone-fly phone-fly-${p.id} pointer-events-none absolute z-40 flex h-20 w-20 items-center justify-center rounded-[1.35rem] border-2 border-[#ca8a04]/50 md:h-24 md:w-24 md:rounded-[1.5rem]`}
-            style={{
-              background: "linear-gradient(145deg, #2a241c 0%, #0a0a0a 100%)",
-              boxShadow: `0 0 28px ${GOLD}88`,
-              left: "50%",
-              top: "50%",
-            }}
-          >
-            <span className="font-[family-name:var(--font-display)] text-xl font-extrabold text-[#faf8f0] md:text-2xl">
-              {p.mark}
-            </span>
-          </div>
-        ))}
-
-        {/* Phone — sits below intro so text never overlaps */}
         <div className="relative z-10 shrink-0" style={{ perspective: "1200px" }}>
           <div
             className="phone-rig relative will-change-transform"
             style={{
-              width: "min(270px, 62vw)",
+              width: "min(260px, 70vw)",
               aspectRatio: "9 / 19.2",
               transformStyle: "preserve-3d",
             }}
@@ -292,7 +335,6 @@ export function PhoneStage() {
               }}
             >
               <div className="absolute left-1/2 top-3 z-30 h-6 w-24 -translate-x-1/2 rounded-full bg-black" />
-
               <div className="relative h-full w-full overflow-hidden rounded-[2rem] bg-[#0c0c0c]">
                 {POSTS.map((p) => (
                   <div
@@ -313,7 +355,34 @@ export function PhoneStage() {
           </div>
         </div>
 
-        <p className="phone-outro absolute bottom-10 left-1/2 z-30 -translate-x-1/2 text-[10px] font-bold uppercase tracking-[0.3em] text-[#8a6a20]">
+        {/* Mobile chips replace docks */}
+        <div className="relative z-20 mt-2 grid w-full max-w-sm grid-cols-2 gap-2.5 md:hidden">
+          {POSTS.map((p) => (
+            <div
+              key={`mchip-${p.id}`}
+              className={`phone-mobile-chip phone-mchip-${p.id} flex items-center gap-2.5 rounded-2xl border border-[#ca8a04]/35 bg-[#1a1510]/90 px-3 py-2.5`}
+              style={{ boxShadow: "0 8px 20px rgba(202,138,4,0.16)" }}
+            >
+              <span
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#ca8a04]/50 font-[family-name:var(--font-display)] text-sm font-extrabold"
+                style={{
+                  color: CREAM,
+                  background: "linear-gradient(145deg, #2a241c 0%, #0c0a08 100%)",
+                }}
+              >
+                {p.mark}
+              </span>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-bold text-[#faf8f0]">{p.name}</p>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-[#ca8a04]/80">
+                  {p.label}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <p className="phone-outro relative z-30 text-[10px] font-bold uppercase tracking-[0.3em] text-[#8a6a20] md:absolute md:bottom-10 md:left-1/2 md:-translate-x-1/2">
           Creative stack ready
         </p>
       </div>
@@ -325,23 +394,23 @@ function PhoneDock({ post }: { post: PostChapter }) {
   return (
     <div className={`phone-dock-item phone-dock-${post.id} flex w-full flex-col items-center gap-2.5`}>
       <div
-        className="flex h-[4.75rem] w-[4.75rem] items-center justify-center rounded-[1.35rem] border-2 border-[#ca8a04]/60 md:h-[5.75rem] md:w-[5.75rem] md:rounded-[1.5rem]"
+        className="flex h-[5.75rem] w-[5.75rem] items-center justify-center rounded-[1.5rem] border-2 border-[#ca8a04]/60"
         style={{
           background: "linear-gradient(145deg, #2a241c 0%, #0c0a08 100%)",
           boxShadow: "0 12px 32px rgba(202,138,4,0.32), inset 0 0 20px rgba(202,138,4,0.14)",
         }}
       >
         <span
-          className="font-[family-name:var(--font-display)] text-xl font-extrabold md:text-2xl"
+          className="font-[family-name:var(--font-display)] text-2xl font-extrabold"
           style={{ color: CREAM, textShadow: `0 0 14px ${GOLD}` }}
         >
           {post.mark}
         </span>
       </div>
-      <p className="text-center font-[family-name:var(--font-display)] text-sm font-bold text-[#1a1510] md:text-base">
+      <p className="text-center font-[family-name:var(--font-display)] text-base font-bold text-[#1a1510]">
         {post.name}
       </p>
-      <p className="text-center text-[11px] font-bold uppercase tracking-[0.12em] text-[#8a6a20] md:text-xs">
+      <p className="text-center text-xs font-bold uppercase tracking-[0.12em] text-[#8a6a20]">
         {post.label}
       </p>
     </div>

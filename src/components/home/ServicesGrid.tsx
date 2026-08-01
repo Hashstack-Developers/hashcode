@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { gsap, useGSAP, registerGsap } from "@/lib/gsap";
 import { services } from "@/data/content";
+import { pinDistance, pinExtras, scrubFeel } from "@/lib/mobile";
 
 const icons: Record<string, LucideIcon> = {
   Globe,
@@ -63,10 +64,10 @@ export function ServicesGrid() {
         scrollTrigger: {
           trigger: root.current,
           start: "top top",
-          end: `+=${160 + ALL.length * 75}%`,
-          scrub: 0.95,
+          end: `+=${pinDistance(160 + ALL.length * 75)}%`,
+          scrub: scrubFeel(0.95),
           pin: true,
-          anticipatePin: 1,
+          ...pinExtras(),
           onUpdate: (self) => emitNav(self.isActive),
           onToggle: (self) => {
             if (!self.isActive) emitNav(false);

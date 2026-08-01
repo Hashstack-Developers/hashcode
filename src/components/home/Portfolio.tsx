@@ -6,6 +6,7 @@ import { ArrowUpRight } from "lucide-react";
 import { gsap, useGSAP, registerGsap } from "@/lib/gsap";
 import { projects } from "@/data/content";
 import { cn } from "@/lib/utils";
+import { pinExtras } from "@/lib/mobile";
 
 export function Portfolio() {
   const root = useRef<HTMLElement>(null);
@@ -34,8 +35,8 @@ export function Portfolio() {
             end: () => `+=${track.scrollWidth * 0.95}`,
             scrub: 1,
             pin: true,
-            anticipatePin: 1,
             invalidateOnRefresh: true,
+            ...pinExtras(),
             onUpdate: (self) => {
               if (fill) gsap.set(fill, { scaleX: self.progress });
             },
@@ -87,6 +88,27 @@ export function Portfolio() {
         });
       });
 
+      mm.add("(max-width: 767px)", () => {
+        gsap.set(".portfolio-intro", { y: 0, autoAlpha: 1 });
+        gsap.set(".portfolio-progress-fill", { scaleX: 1 });
+        gsap.set(".project-card", { y: 20, autoAlpha: 0 });
+
+        // Single trigger — avoids per-card ST thrash between sections
+        gsap.to(".project-card", {
+          y: 0,
+          autoAlpha: 1,
+          stagger: 0.1,
+          duration: 0.55,
+          ease: "power2.out",
+          overwrite: "auto",
+          scrollTrigger: {
+            trigger: ".portfolio-pin",
+            start: "top 82%",
+            once: true,
+          },
+        });
+      });
+
       return () => mm.revert();
     },
     { scope: root },
@@ -103,21 +125,24 @@ export function Portfolio() {
             Case studies that explode into the frame.
           </h2>
           <p className="mt-3 max-w-2xl text-sm text-[#faf8f0]/50 md:text-base">
-            Horizontal scroll gallery — mockups surge as each case locks center stage.
+            <span className="md:hidden">Tap through the work — each case in its own frame.</span>
+            <span className="hidden md:inline">
+              Horizontal scroll gallery — mockups surge as each case locks center stage.
+            </span>
           </p>
-          <div className="mt-6 h-1 max-w-xs overflow-hidden rounded-full bg-[#faf8f0]/10">
+          <div className="mt-6 hidden h-1 max-w-xs overflow-hidden rounded-full bg-[#faf8f0]/10 md:block">
             <div className="portfolio-progress-fill h-full origin-left scale-x-0 rounded-full bg-[#ca8a04]" />
           </div>
         </div>
 
         <div
-          className="portfolio-track flex w-max gap-5 px-5 md:gap-6 md:px-8"
+          className="portfolio-track flex w-full flex-col gap-4 px-5 md:w-max md:flex-row md:gap-6 md:px-8"
           style={{ perspective: "1200px" }}
         >
           {projects.map((project, i) => (
             <article
               key={project.id}
-              className="project-card group relative h-[420px] w-[82vw] max-w-[520px] overflow-hidden rounded-3xl border border-[#ca8a04]/25 md:h-[520px] md:w-[560px]"
+              className="project-card group relative h-[360px] w-full overflow-hidden rounded-3xl border border-[#ca8a04]/25 md:h-[520px] md:w-[560px] md:max-w-[560px]"
               style={{ transformStyle: "preserve-3d" }}
             >
               <div

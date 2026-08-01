@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { gsap, useGSAP, registerGsap } from "@/lib/gsap";
 import { techStack } from "@/data/content";
+import { pinDistance, pinExtras, scrubFeel } from "@/lib/mobile";
 
 const LAYOUT = techStack.map((tech, i) => {
   const angle = (i / techStack.length) * Math.PI * 2 - Math.PI / 2;
@@ -33,6 +34,41 @@ export function TechStack() {
       registerGsap();
       if (!root.current) return;
 
+      const mm = gsap.matchMedia();
+
+      mm.add("(max-width: 767px)", () => {
+        const mobileList = root.current?.querySelector(".tech-mobile-list");
+        if (!mobileList) return;
+
+        gsap.set(".tech-night", { autoAlpha: 1 });
+        gsap.set(".tech-day", { autoAlpha: 0 });
+        gsap.set(".tech-stars", { autoAlpha: 0.7 });
+        gsap.set(".tech-sun", { autoAlpha: 0 });
+        gsap.set(".tech-moon", { top: "14%", scale: 1, autoAlpha: 1 });
+        gsap.set(".tech-blush", { autoAlpha: 0.1 });
+        gsap.set(".tech-intro-day", { autoAlpha: 0 });
+        gsap.set(".tech-intro-night", { y: 0, autoAlpha: 1 });
+        gsap.set(".tech-hint", { autoAlpha: 0 });
+        gsap.set(".tech-cloud", { autoAlpha: 0 });
+        gsap.set(mobileList, { autoAlpha: 0, y: 16 });
+        gsap.set(".tech-cat", { autoAlpha: 0, y: 8 });
+        gsap.set(".tech-outro", { autoAlpha: 0 });
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: root.current,
+            start: "top 80%",
+            end: "+=110%",
+            scrub: scrubFeel(0.4),
+          },
+        });
+
+        tl.to(mobileList, { autoAlpha: 1, y: 0, duration: 0.5, ease: "none" }, 0)
+          .to(".tech-cat", { autoAlpha: 1, y: 0, stagger: 0.05, duration: 0.35, ease: "none" }, 0.2)
+          .to(".tech-outro", { autoAlpha: 1, duration: 0.3, ease: "none" }, 0.45);
+      });
+
+      mm.add("(min-width: 768px)", () => {
       let navLight = true;
       const emitNav = (light: boolean) => {
         if (light === navLight) return;
@@ -40,40 +76,31 @@ export function TechStack() {
         window.dispatchEvent(new CustomEvent("hashstack:dawn-light", { detail: light }));
       };
 
-      // Start in day (handoff from Services)
-      gsap.set(".tech-day", { autoAlpha: 1 });
       gsap.set(".tech-night", { autoAlpha: 0 });
+      gsap.set(".tech-day", { autoAlpha: 1 });
       gsap.set(".tech-stars", { autoAlpha: 0 });
-      gsap.set(".tech-moon", { top: "118%", scale: 0.55, autoAlpha: 0 });
-      gsap.set(".tech-sun", { top: "22%", scale: 1, autoAlpha: 0.95 });
-      gsap.set(".tech-blush", { autoAlpha: 0.2 });
+      gsap.set(".tech-sun", { top: "22%", scale: 1, autoAlpha: 1 });
+      gsap.set(".tech-moon", { top: "118%", scale: 0.7, autoAlpha: 0 });
+      gsap.set(".tech-blush", { autoAlpha: 0 });
       gsap.set(".tech-intro-day", { y: 20, autoAlpha: 0 });
-      gsap.set(".tech-intro-night", { y: 20, autoAlpha: 0 });
-      gsap.set(".tech-node", {
-        left: "50%",
-        top: "55%",
-        xPercent: -50,
-        yPercent: -50,
-        scale: 0.2,
-        autoAlpha: 0,
-      });
+      gsap.set(".tech-intro-night", { y: 24, autoAlpha: 0 });
+      gsap.set(".tech-hint", { autoAlpha: 1 });
+      gsap.set(".tech-node", { autoAlpha: 0, scale: 0.55, left: "50%", top: "55%" });
       gsap.set(".tech-core", { scale: 0.45, autoAlpha: 0 });
       gsap.set(".tech-line", { strokeDashoffset: 1 });
       gsap.set(".tech-cat", { autoAlpha: 0, y: 10 });
       gsap.set(".tech-cloud", { autoAlpha: 0, y: 24 });
-      gsap.set(".tech-hint", { autoAlpha: 1 });
       gsap.set(".tech-outro", { autoAlpha: 0 });
 
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: root.current,
           start: "top top",
-          end: "+=340%",
+          end: `+=${pinDistance(340)}%`,
           scrub: 0.95,
           pin: true,
-          anticipatePin: 1,
+          ...pinExtras(),
           onUpdate: (self) => {
-            // Day nav early; flip dark once night owns the sky
             emitNav(self.isActive && self.progress < 0.38);
           },
           onToggle: (self) => {
@@ -129,17 +156,19 @@ export function TechStack() {
         .to(".tech-core", { scale: 1.12, duration: 0.45, ease: "none" }, 4.5)
         .to(".tech-moon", { top: "12%", duration: 0.5, ease: "none" }, 4.55)
         .to(".tech-outro", { autoAlpha: 1, duration: 0.4, ease: "none" }, 4.9);
+      });
+
+      return () => mm.revert();
     },
     { scope: root },
   );
-
   return (
     <section
       ref={root}
-      className="relative min-h-[100svh] overflow-hidden"
+      className="relative min-h-[100svh] overflow-hidden md:min-h-[100svh]"
       aria-label="Tech stack constellation — day to night"
     >
-      <div className="relative flex h-[100svh] flex-col overflow-hidden px-5 py-16 md:px-8 md:py-20">
+      <div className="relative flex min-h-[100svh] flex-col overflow-hidden px-5 py-16 md:h-[100svh] md:px-8 md:py-20">
         {/* Day sky */}
         <div
           className="tech-day absolute inset-0"
@@ -253,8 +282,8 @@ export function TechStack() {
           Scroll · night falls
         </p>
 
-        {/* Constellation panel */}
-        <div className="relative z-10 mx-auto mt-4 w-full max-w-5xl flex-1">
+        {/* Constellation panel — desktop */}
+        <div className="relative z-10 mx-auto mt-4 hidden w-full max-w-5xl flex-1 md:block">
           <div className="tech-cloud relative h-full min-h-[48vh] overflow-hidden rounded-3xl border border-[#ca8a04]/25 bg-[#0c0a08]/75 backdrop-blur-sm">
             <div className="pointer-events-none absolute inset-0 opacity-25 [background-image:radial-gradient(rgba(202,138,4,0.2)_1px,transparent_1px)] [background-size:28px_28px]" />
 
@@ -306,6 +335,22 @@ export function TechStack() {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Mobile wrapping tech chips — replaces crowded orbit */}
+        <div className="tech-mobile-list relative z-10 mx-auto mt-6 grid w-full max-w-lg grid-cols-2 gap-2 md:hidden">
+          {techStack.map((tech) => (
+            <div
+              key={tech.name}
+              className="rounded-2xl border border-[#ca8a04]/35 bg-[#141210]/90 px-3 py-3"
+              style={{ boxShadow: "0 8px 20px rgba(0,0,0,0.35)" }}
+            >
+              <p className="text-sm font-bold text-[#faf8f0]">{tech.name}</p>
+              <p className="mt-0.5 text-[10px] uppercase tracking-[0.16em] text-[#ca8a04]/75">
+                {tech.category}
+              </p>
+            </div>
+          ))}
         </div>
 
         <div className="relative z-20 mx-auto mt-4 flex flex-wrap justify-center gap-2">

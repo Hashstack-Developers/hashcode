@@ -3,16 +3,60 @@
 import { useEffect, useRef } from "react";
 import Lenis from "lenis";
 import { gsap, ScrollTrigger, registerGsap } from "@/lib/gsap";
+import { isMobileViewport } from "@/lib/mobile";
 
 /**
- * Global inertial scroll via `lenis` (successor to @studio-freight/lenis).
- * Syncs with GSAP ScrollTrigger through the ticker + scroll listener.
+ * Desktop: Lenis smooth scroll + ScrollTrigger sync.
+ * Mobile: native scroll + ScrollTrigger.normalizeScroll (in registerGsap).
+ * Soft-touch Lenis is NOT used on mobile — it fights normalizeScroll / pins.
  */
 export function LenisProvider({ children }: { children: React.ReactNode }) {
   const lenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
     registerGsap();
+    ScrollTrigger.config({
+      ignoreMobileResize: true,
+      autoRefreshEvents: "visibilitychange,DOMContentLoaded,load",
+    });
+
+    const mobile = isMobileViewport();
+    let refreshTimer: number | undefined;
+
+    const hardRefresh = () => {
+      // Debounce — rapid refresh mid-scroll is what makes section anims “break then fix”
+      window.clearTimeout(refreshTimer);
+      refreshTimer = window.setTimeout(() => {
+        ScrollTrigger.refresh(true);
+      }, 80);
+    };
+
+    if (mobile) {
+      const onDone = () => {
+        // One settle pass after loader + fonts — avoid a refresh storm
+        hardRefresh();
+        window.setTimeout(() => ScrollTrigger.refresh(true), 400);
+      };
+
+      window.addEventListener("hashstack:loader-done", onDone);
+      const failsafe = window.setTimeout(onDone, 2500);
+
+      const onOrient = () => {
+        window.setTimeout(() => ScrollTrigger.refresh(true), 200);
+      };
+      window.addEventListener("orientationchange", onOrient);
+
+      void document.fonts?.ready?.then(() => {
+        window.setTimeout(() => ScrollTrigger.refresh(true), 100);
+      });
+
+      return () => {
+        window.clearTimeout(failsafe);
+        window.clearTimeout(refreshTimer);
+        window.removeEventListener("hashstack:loader-done", onDone);
+        window.removeEventListener("orientationchange", onOrient);
+      };
+    }
 
     const lenis = new Lenis({
       duration: 1.2,
@@ -23,7 +67,6 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
 
     lenisRef.current = lenis;
     lenis.stop();
-
     lenis.on("scroll", ScrollTrigger.update);
 
     const ticker = (time: number) => {
@@ -34,24 +77,20 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
 
     const unlock = () => {
       lenis.start();
-      ScrollTrigger.refresh();
-      // Second refresh after pin spacers settle (dawn/mac/phone/dusk)
-      window.setTimeout(() => ScrollTrigger.refresh(), 400);
+      hardRefresh();
+      window.setTimeout(() => ScrollTrigger.refresh(true), 400);
     };
     const lock = () => lenis.stop();
 
     window.addEventListener("hashstack:loader-done", unlock);
     window.addEventListener("hashstack:loader-lock", lock);
-
-    // Mobile-friendly failsafe — unlock scroll even if loader event is late
     const failsafe = window.setTimeout(unlock, 7000);
-
-    // Do NOT skip via session — loader plays every refresh
-    const onResize = () => ScrollTrigger.refresh();
+    const onResize = () => hardRefresh();
     window.addEventListener("resize", onResize);
 
     return () => {
       window.clearTimeout(failsafe);
+      window.clearTimeout(refreshTimer);
       window.removeEventListener("hashstack:loader-done", unlock);
       window.removeEventListener("hashstack:loader-lock", lock);
       window.removeEventListener("resize", onResize);

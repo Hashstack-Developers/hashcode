@@ -31,6 +31,13 @@ html {
   scroll-behavior: auto;
 }
 
+@media (max-width: 767px) {
+  html,
+  body {
+    overscroll-behavior-y: none;
+  }
+}
+
 html.lenis,
 html.lenis body {
   height: auto;

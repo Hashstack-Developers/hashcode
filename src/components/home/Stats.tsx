@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { gsap, useGSAP, registerGsap } from "@/lib/gsap";
 import { stats } from "@/data/content";
+import { isMobileViewport, pinDistance, pinExtras, scrubFeel } from "@/lib/mobile";
 
 type Particle = {
   angle: number;
@@ -12,10 +13,9 @@ type Particle = {
   shade: string;
 };
 
-const PARTICLE_COUNT = 1000;
-
 /**
  * Number theater → ring grows → shatter via canvas particles (GPU-light) → day.
+ * Mobile: far fewer particles + shorter pin — 1000 arcs @ high DPR freezes phones.
  */
 export function Stats() {
   const root = useRef<HTMLElement>(null);
@@ -25,6 +25,9 @@ export function Stats() {
     () => {
       registerGsap();
       if (!root.current) return;
+
+      const mobile = isMobileViewport();
+      const particleCount = mobile ? 90 : 1000;
 
       let navLight = false;
       const emitNav = (light: boolean) => {
@@ -50,8 +53,8 @@ export function Stats() {
 
       const canvas = canvasRef.current;
       const ctx = canvas?.getContext("2d", { alpha: true });
-      const particles: Particle[] = Array.from({ length: PARTICLE_COUNT }, (_, i) => ({
-        angle: (i / PARTICLE_COUNT) * Math.PI * 2 + (i % 17) * 0.021,
+      const particles: Particle[] = Array.from({ length: particleCount }, (_, i) => ({
+        angle: (i / particleCount) * Math.PI * 2 + (i % 17) * 0.021,
         ringR: 85 + (i % 9) * 12,
         dist: 0.45 + (i % 13) * 0.08,
         size: i % 17 === 0 ? 3.8 : i % 7 === 0 ? 2.4 : i % 3 === 0 ? 1.6 : 1.1,
@@ -67,7 +70,7 @@ export function Stats() {
 
       const resizeCanvas = () => {
         if (!canvas) return;
-        const dpr = Math.min(window.devicePixelRatio || 1, 1.75);
+        const dpr = Math.min(window.devicePixelRatio || 1, mobile ? 1 : 1.75);
         const w = window.innerWidth;
         const h = window.innerHeight;
         canvas.width = Math.floor(w * dpr);
@@ -124,14 +127,16 @@ export function Stats() {
         });
       };
 
+      const pinEnd = pinDistance(250 + stats.length * 70);
+
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: root.current,
           start: "top top",
-          end: `+=${250 + stats.length * 70}%`,
-          scrub: 0.95,
+          end: `+=${pinEnd}%`,
+          scrub: scrubFeel(mobile ? 0.55 : 0.95),
           pin: true,
-          anticipatePin: 1,
+          ...pinExtras(),
           onUpdate: (self) => {
             emitNav(self.isActive && self.progress >= 0.84);
           },
@@ -223,12 +228,12 @@ export function Stats() {
         .to(".stat-glow", { scale: 2.8, autoAlpha: 1, duration: 0.55, ease: "none" }, boom)
         .to(
           shake,
-          { amp: 2.5, phase: 10, duration: 0.28, ease: "none", onUpdate: applyShake },
+          { amp: mobile ? 1.2 : 2.5, phase: 10, duration: 0.28, ease: "none", onUpdate: applyShake },
           boom,
         )
         .to(
           shake,
-          { amp: 7, phase: 28, duration: 0.27, ease: "none", onUpdate: applyShake },
+          { amp: mobile ? 3 : 7, phase: 28, duration: 0.27, ease: "none", onUpdate: applyShake },
           boom + 0.28,
         );
 
@@ -237,7 +242,7 @@ export function Stats() {
       // Peak → FAST shake → DHAMAKA full-screen
       tl.to(
         shake,
-        { amp: 18, phase: 55, duration: 0.18, ease: "none", onUpdate: applyShake },
+        { amp: mobile ? 6 : 18, phase: 55, duration: 0.18, ease: "none", onUpdate: applyShake },
         hit,
       )
         .to(".stat-flash", { autoAlpha: 0.75, duration: 0.1, ease: "none" }, hit)
@@ -261,7 +266,7 @@ export function Stats() {
         )
         .to(
           shake,
-          { amp: 11, phase: 72, duration: 0.28, ease: "none", onUpdate: applyShake },
+          { amp: mobile ? 4 : 11, phase: 72, duration: 0.28, ease: "none", onUpdate: applyShake },
           hit + 0.15,
         )
         .to(

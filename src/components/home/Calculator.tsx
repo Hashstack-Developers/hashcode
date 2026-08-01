@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 import { gsap, useGSAP, registerGsap } from "@/lib/gsap";
 import { cn } from "@/lib/utils";
+import { pinDistance, pinExtras } from "@/lib/mobile";
 
 const steps = [
   {
@@ -76,35 +77,49 @@ export function Calculator() {
       registerGsap();
       if (!root.current) return;
 
-      gsap.set(".calc-intro", { y: 24, autoAlpha: 0 });
-      gsap.set(".calc-left", { x: -60, autoAlpha: 0 });
-      gsap.set(".calc-right", { x: 60, autoAlpha: 0 });
-      gsap.set(".calc-glow", { autoAlpha: 0, scale: 0.7 });
-      gsap.set(".calc-hint", { autoAlpha: 1 });
+      const mm = gsap.matchMedia();
 
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: root.current,
-          start: "top top",
-          end: "+=220%",
-          scrub: 0.9,
-          pin: true,
-          anticipatePin: 1,
-        },
+      mm.add("(max-width: 767px)", () => {
+        gsap.set(".calc-intro", { y: 0, autoAlpha: 1 });
+        gsap.set(".calc-left", { x: 0, autoAlpha: 1 });
+        gsap.set(".calc-right", { x: 0, autoAlpha: 1 });
+        gsap.set(".calc-glow", { autoAlpha: 0.6, scale: 1 });
+        gsap.set(".calc-hint", { autoAlpha: 0 });
+        gsap.set(".calc-outro", { autoAlpha: 1 });
       });
 
-      tl.to(".calc-intro", { y: 0, autoAlpha: 1, duration: 0.5, ease: "none" }, 0)
-        .to(".calc-glow", { autoAlpha: 0.8, scale: 1, duration: 0.55, ease: "none" }, 0.15)
-        .to(".calc-hint", { autoAlpha: 0.45, duration: 0.3, ease: "none" }, 0.2)
-        .to(".calc-hint", { autoAlpha: 0, duration: 0.35, ease: "none" }, 0.55)
-        .to(".calc-left", { x: 0, autoAlpha: 1, duration: 0.7, ease: "none" }, 0.6)
-        .to(".calc-right", { x: 0, autoAlpha: 1, duration: 0.7, ease: "none" }, 0.75)
-        .to(".calc-left", { y: -6, duration: 0.5, ease: "none" }, 1.4)
-        .to(".calc-right", { y: 6, duration: 0.5, ease: "none" }, 1.4)
-        .to(".calc-glow", { scale: 1.12, duration: 0.6, ease: "none" }, 1.6)
-        .to(".calc-outro", { autoAlpha: 1, duration: 0.4, ease: "none" }, 2.0);
+      mm.add("(min-width: 768px)", () => {
+        gsap.set(".calc-intro", { y: 24, autoAlpha: 0 });
+        gsap.set(".calc-left", { x: -60, autoAlpha: 0 });
+        gsap.set(".calc-right", { x: 60, autoAlpha: 0 });
+        gsap.set(".calc-glow", { autoAlpha: 0, scale: 0.7 });
+        gsap.set(".calc-hint", { autoAlpha: 1 });
+        gsap.set(".calc-outro", { autoAlpha: 0 });
 
-      gsap.set(".calc-outro", { autoAlpha: 0 });
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: root.current,
+            start: "top top",
+            end: `+=${pinDistance(220)}%`,
+            scrub: 0.9,
+            pin: true,
+            ...pinExtras(),
+          },
+        });
+
+        tl.to(".calc-intro", { y: 0, autoAlpha: 1, duration: 0.5, ease: "none" }, 0)
+          .to(".calc-glow", { autoAlpha: 0.8, scale: 1, duration: 0.55, ease: "none" }, 0.15)
+          .to(".calc-hint", { autoAlpha: 0.45, duration: 0.3, ease: "none" }, 0.2)
+          .to(".calc-hint", { autoAlpha: 0, duration: 0.35, ease: "none" }, 0.55)
+          .to(".calc-left", { x: 0, autoAlpha: 1, duration: 0.7, ease: "none" }, 0.6)
+          .to(".calc-right", { x: 0, autoAlpha: 1, duration: 0.7, ease: "none" }, 0.75)
+          .to(".calc-left", { y: -6, duration: 0.5, ease: "none" }, 1.4)
+          .to(".calc-right", { y: 6, duration: 0.5, ease: "none" }, 1.4)
+          .to(".calc-glow", { scale: 1.12, duration: 0.6, ease: "none" }, 1.6)
+          .to(".calc-outro", { autoAlpha: 1, duration: 0.4, ease: "none" }, 2.0);
+      });
+
+      return () => mm.revert();
     },
     { scope: root },
   );
@@ -114,10 +129,10 @@ export function Calculator() {
   return (
     <section
       ref={root}
-      className="relative min-h-[100svh] overflow-hidden bg-[#080706]"
+      className="relative overflow-hidden bg-[#080706] md:min-h-[100svh]"
       aria-label="Project calculator"
     >
-      <div className="relative flex h-[100svh] flex-col px-5 py-16 md:px-8 md:py-20">
+      <div className="relative flex min-h-0 flex-col px-5 py-16 md:h-[100svh] md:px-8 md:py-20">
         <div
           className="calc-glow pointer-events-none absolute left-1/2 top-1/2 h-[50vmin] w-[70vmin] -translate-x-1/2 -translate-y-1/2 rounded-full"
           style={{

@@ -5,6 +5,7 @@ import { useRef } from "react";
 import { ArrowUpRight, Moon, Radio, Shield, Zap } from "lucide-react";
 import { gsap, useGSAP, registerGsap } from "@/lib/gsap";
 import { siteConfig } from "@/data/content";
+import { pinDistance, pinExtras, scrubFeel } from "@/lib/mobile";
 
 const NIGHT_POINTS = [
   {
@@ -60,10 +61,10 @@ export function DuskTransition() {
         scrollTrigger: {
           trigger: root.current,
           start: "top top",
-          end: "+=320%",
-          scrub: 0.85,
+          end: `+=${pinDistance(320)}%`,
+          scrub: scrubFeel(0.85),
           pin: true,
-          anticipatePin: 1,
+          ...pinExtras(),
           onUpdate: (self) => {
             // Light nav while still day; dark once night takes over
             emitNav(self.isActive && self.progress < 0.48);
@@ -274,7 +275,7 @@ export function DuskTransition() {
         </p>
 
         {/* Day copy — visible at start */}
-        <div className="dusk-day-copy pointer-events-none absolute inset-x-0 top-24 z-30 px-6 text-center md:top-28">
+        <div className="dusk-day-copy pointer-events-none absolute inset-x-0 top-[5.75rem] z-30 px-6 text-center md:top-28">
           <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.4em] text-[#8a6a20]">
             End of day · {siteConfig.location}
           </p>
@@ -286,43 +287,43 @@ export function DuskTransition() {
           </p>
         </div>
 
-        {/* Night info panel */}
-        <div className="dusk-night-copy pointer-events-none absolute inset-0 z-30 mx-auto flex max-w-6xl flex-col justify-center px-6 pb-[22vh] pt-24 md:px-10 md:pb-[24vh]">
-          <div className="mb-8 flex items-center gap-3 md:mb-10">
-            <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[#ca8a04]/40 bg-[#ca8a04]/10">
+        {/* Night info panel — mobile: top-align under fixed nav (center was sliding heading under header) */}
+        <div className="dusk-night-copy pointer-events-none absolute inset-0 z-30 mx-auto flex max-w-6xl flex-col justify-start overflow-y-auto overscroll-contain px-5 pb-[18vh] pt-[5.75rem] md:justify-center md:overflow-visible md:px-10 md:pb-[24vh] md:pt-28">
+          <div className="mb-5 flex shrink-0 items-center gap-3 md:mb-10">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#ca8a04]/40 bg-[#ca8a04]/10">
               <Moon className="h-5 w-5 text-[#f5d76e]" />
             </span>
-            <div>
+            <div className="min-w-0">
               <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-[#ca8a04]">
                 After dark · partnership
               </p>
-              <h2 className="font-[family-name:var(--font-display)] text-2xl font-extrabold text-[#faf8f0] md:text-4xl">
+              <h2 className="font-[family-name:var(--font-display)] text-xl font-extrabold leading-tight text-[#faf8f0] sm:text-2xl md:text-4xl">
                 How we stay with you.
               </h2>
             </div>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-3 md:gap-5">
+          <div className="grid shrink-0 gap-3 md:grid-cols-3 md:gap-5">
             {NIGHT_POINTS.map((item) => (
               <div
                 key={item.title}
-                className="dusk-card rounded-2xl border border-[#ca8a04]/25 bg-[#141210]/75 p-5 backdrop-blur-sm md:p-6"
+                className="dusk-card rounded-2xl border border-[#ca8a04]/25 bg-[#141210]/75 p-4 backdrop-blur-sm md:p-6"
               >
-                <item.icon className="mb-3 h-6 w-6 text-[#ca8a04]" />
-                <p className="font-[family-name:var(--font-display)] text-lg font-bold text-[#faf8f0]">
+                <item.icon className="mb-2.5 h-5 w-5 text-[#ca8a04] md:mb-3 md:h-6 md:w-6" />
+                <p className="font-[family-name:var(--font-display)] text-base font-bold text-[#faf8f0] md:text-lg">
                   {item.title}
                 </p>
-                <p className="mt-2 text-sm leading-relaxed text-[#faf8f0]/65">{item.body}</p>
+                <p className="mt-1.5 text-sm leading-relaxed text-[#faf8f0]/65 md:mt-2">{item.body}</p>
               </div>
             ))}
           </div>
 
-          <div className="dusk-card pointer-events-auto mt-6 flex flex-col items-start gap-4 rounded-2xl border border-[#ca8a04]/30 bg-[#0a0908]/80 p-5 md:mt-8 md:flex-row md:items-center md:justify-between md:p-6">
+          <div className="dusk-card pointer-events-auto mt-4 flex shrink-0 flex-col items-start gap-4 rounded-2xl border border-[#ca8a04]/30 bg-[#0a0908]/80 p-4 md:mt-8 md:flex-row md:items-center md:justify-between md:p-6">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#ca8a04]">
                 Ready when you are
               </p>
-              <p className="mt-1 font-[family-name:var(--font-display)] text-xl font-bold text-[#faf8f0] md:text-2xl">
+              <p className="mt-1 font-[family-name:var(--font-display)] text-lg font-bold text-[#faf8f0] md:text-2xl">
                 Brief us. We ship through the night.
               </p>
               <p className="mt-1 text-sm text-[#faf8f0]/55">{siteConfig.email}</p>

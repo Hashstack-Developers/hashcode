@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { gsap, useGSAP, registerGsap } from "@/lib/gsap";
+import { isMobileViewport, pinDistance, pinExtras, scrubFeel } from "@/lib/mobile";
 
 const GOLD = "#ca8a04";
 const CREAM = "#faf8f0";
@@ -41,15 +42,20 @@ export function LaptopGlowStage() {
       registerGsap();
       if (!root.current) return;
 
+      const mobile = isMobileViewport();
+      const litFilter = mobile ? "none" : "brightness(1.08) saturate(1)";
+      const dimFilter = mobile ? "none" : "brightness(0.28) saturate(0.4)";
+
       gsap.set(".glow-intro", { y: 20, autoAlpha: 0 });
       gsap.set(".glow-stage", { autoAlpha: 0.5, y: 24 });
       gsap.set(".glow-screen-wash", { opacity: 0 });
       gsap.set(".glow-beam", { autoAlpha: 0, scaleX: 0.12, transformOrigin: "left center" });
       gsap.set(".glow-mote", { autoAlpha: 0 });
       gsap.set(".glow-card", {
-        autoAlpha: 0.2,
-        x: 28,
-        filter: "brightness(0.28) saturate(0.4)",
+        autoAlpha: mobile ? 0.35 : 0.2,
+        x: mobile ? 0 : 28,
+        y: mobile ? 16 : 0,
+        filter: dimFilter,
       });
       gsap.set(".glow-card-rim", { opacity: 0 });
       gsap.set(".glow-card-face", { opacity: 0 });
@@ -60,10 +66,10 @@ export function LaptopGlowStage() {
         scrollTrigger: {
           trigger: root.current,
           start: "top top",
-          end: `+=${200 + REVEALS.length * 55}%`,
-          scrub: 0.95,
+          end: `+=${pinDistance(200 + REVEALS.length * 55)}%`,
+          scrub: scrubFeel(mobile ? 0.55 : 0.95),
           pin: true,
-          anticipatePin: 1,
+          ...pinExtras(),
         },
       });
 
@@ -86,7 +92,8 @@ export function LaptopGlowStage() {
             {
               autoAlpha: 1,
               x: 0,
-              filter: "brightness(1.08) saturate(1)",
+              y: 0,
+              filter: litFilter,
               duration: 0.5,
               ease: "none",
             },
@@ -137,10 +144,10 @@ export function LaptopGlowStage() {
           Scroll · beam finds the cards
         </p>
 
-        {/* Centered tight stage — laptop | beam | cards */}
-        <div className="glow-stage relative z-10 mx-auto mt-6 flex min-h-0 w-full max-w-5xl flex-1 items-center justify-center gap-0 md:mt-8">
+        {/* Centered tight stage — laptop | beam | cards (stack on mobile) */}
+        <div className="glow-stage relative z-10 mx-auto mt-4 flex min-h-0 w-full max-w-5xl flex-1 flex-col items-center justify-center gap-4 md:mt-8 md:flex-row md:gap-0">
           {/* Laptop */}
-          <div className="relative z-20 w-[min(300px,38vw)] shrink-0 md:w-[320px]">
+          <div className="relative z-20 w-[min(260px,70vw)] shrink-0 md:w-[320px]">
             <div
               className="relative overflow-hidden rounded-t-[12px] border border-[#2a2a2a] bg-[#0a0a0a]"
               style={{
@@ -149,7 +156,7 @@ export function LaptopGlowStage() {
                 aspectRatio: "16 / 10.4",
                 boxShadow:
                   "inset 0 0 0 2px #141414, 0 0 50px rgba(202,138,4,0.28), 0 28px 60px rgba(0,0,0,0.5)",
-                transform: "perspective(900px) rotateY(32deg)",
+                transform: "perspective(900px) rotateY(18deg)",
                 transformOrigin: "right center",
               }}
             >
@@ -196,8 +203,8 @@ export function LaptopGlowStage() {
             </div>
           </div>
 
-          {/* Beam — sibling between laptop & cards (NOT clipped) */}
-          <div className="relative z-10 -ml-3 h-[42%] w-[min(220px,22vw)] shrink-0 md:-ml-4 md:h-[48%] md:w-[240px]">
+          {/* Beam — desktop only (blur filters thrash phones) */}
+          <div className="relative z-10 -ml-3 hidden h-[42%] w-[min(220px,22vw)] shrink-0 md:block md:-ml-4 md:h-[48%] md:w-[240px]">
             <div
               className="glow-beam absolute inset-0"
               style={{
@@ -239,7 +246,7 @@ export function LaptopGlowStage() {
           </div>
 
           {/* Cards */}
-          <div className="relative z-20 flex w-[min(300px,40vw)] shrink-0 flex-col justify-center gap-2.5 md:w-[320px] md:gap-3">
+          <div className="relative z-20 flex w-full max-w-sm shrink-0 flex-col justify-center gap-2 md:w-[320px] md:gap-3">
             {REVEALS.map((card, i) => (
               <article
                 key={card.id}

@@ -1,8 +1,9 @@
 "use client";
 
 import { useRef } from "react";
-import { gsap, ScrollTrigger, useGSAP, registerGsap } from "@/lib/gsap";
+import { gsap, useGSAP, registerGsap } from "@/lib/gsap";
 import { whyUs } from "@/data/content";
+import { pinExtras } from "@/lib/mobile";
 
 /**
  * Why us — pinned cascade with depth wipe + progress rail.
@@ -34,7 +35,7 @@ export function WhyUs() {
             end: () => `+=${cards.length * 160}%`,
             scrub: 1.05,
             pin: true,
-            anticipatePin: 1,
+            ...pinExtras(),
           },
         });
 
@@ -93,29 +94,27 @@ export function WhyUs() {
         const stack = root.current?.querySelector(".why-stack");
         if (!stack || !cards.length) return;
 
-        gsap.set(cards, { y: 40, autoAlpha: 0, clearProps: false });
+        gsap.set(cards, { y: 28, autoAlpha: 0 });
         gsap.set(".why-intro", { autoAlpha: 1, y: 0 });
 
-        ScrollTrigger.create({
-          trigger: stack,
-          start: "top 80%",
-          once: true,
-          onEnter: () => {
-            gsap.to(cards, {
-              y: 0,
-              autoAlpha: 1,
-              stagger: 0.12,
-              duration: 0.7,
-              ease: "power3.out",
-              overwrite: "auto",
-            });
+        gsap.to(cards, {
+          y: 0,
+          autoAlpha: 1,
+          stagger: 0.12,
+          duration: 0.65,
+          ease: "power2.out",
+          overwrite: "auto",
+          scrollTrigger: {
+            trigger: stack,
+            start: "top 82%",
+            once: true,
           },
         });
       });
 
       return () => mm.revert();
     },
-    { scope: root },
+    { scope: root, dependencies: [] },
   );
 
   return (
