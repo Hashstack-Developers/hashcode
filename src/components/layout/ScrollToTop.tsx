@@ -37,12 +37,13 @@ export function ScrollToTop() {
           exit={{ opacity: 0, y: 12, scale: 0.92 }}
           transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
           className={cn(
-            "fixed bottom-5 right-5 z-[80] flex h-11 w-11 items-center justify-center",
+            // Sit above the WhatsApp FAB
+            "fixed bottom-[5.75rem] right-5 z-[80] flex h-11 w-11 items-center justify-center",
             "rounded-full border border-[#ca8a04]/45 bg-[#141210]/88 text-[#ca8a04]",
             "shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-md",
             "transition-colors hover:border-[#ca8a04] hover:bg-[#ca8a04] hover:text-[#141210]",
             "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ca8a04]",
-            "md:bottom-8 md:right-8 md:h-12 md:w-12",
+            "md:bottom-[6.5rem] md:right-8 md:h-12 md:w-12",
           )}
         >
           <ArrowUp className="h-5 w-5" strokeWidth={2.25} />

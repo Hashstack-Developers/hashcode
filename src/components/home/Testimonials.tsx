@@ -174,10 +174,10 @@ export function Testimonials() {
             Testimonials
           </p>
           <h2 className="font-[family-name:var(--font-display)] text-3xl font-extrabold text-[#faf8f0] md:text-5xl">
-            Floating proof from partners who stayed.
+            Partners who trusted one team for everything.
           </h2>
           <p className="mt-3 text-sm text-[#faf8f0]/50 md:text-base">
-            Scroll — each quote floats into focus, then parks in the frame.
+            Rebuilds, apps, AI, brand — scroll each quote into focus.
           </p>
         </div>
 

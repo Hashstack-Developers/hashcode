@@ -371,10 +371,10 @@ export function Stats() {
                 Impact
               </p>
               <h2 className="font-[family-name:var(--font-display)] text-3xl font-extrabold text-[#faf8f0] md:text-5xl">
-                Numbers that survive the scroll.
+                Proof across every service we ship.
               </h2>
               <p className="mt-3 text-sm text-[#faf8f0]/50 md:text-base">
-                Each proof point takes the stage — then docks into the ledger.
+                Projects, retention, clients, and the speed jump after we left the slow legacy era.
               </p>
             </div>
             <div className="stat-intro-day absolute inset-x-0 top-0">
@@ -382,10 +382,10 @@ export function Stats() {
                 Impact · daybreak
               </p>
               <h2 className="font-[family-name:var(--font-display)] text-3xl font-extrabold text-[#1a1510] md:text-5xl">
-                The ledger opens to daylight.
+                The numbers stay. Services come next.
               </h2>
               <p className="mt-3 text-sm text-[#5c4a28] md:text-base">
-                Circle shattered. Proof remains. Capabilities next.
+                From web and apps to design, cloud, and AI — the full catalog opens in daylight.
               </p>
             </div>
           </div>

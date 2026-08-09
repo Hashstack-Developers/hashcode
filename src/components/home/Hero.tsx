@@ -7,7 +7,7 @@ import { ArrowDown, ArrowRight } from "lucide-react";
 import { gsap, useGSAP, registerGsap } from "@/lib/gsap";
 import { ParallaxBrand } from "@/components/home/ParallaxBrand";
 import { ShootingStars } from "@/components/home/ShootingStars";
-import { siteConfig } from "@/data/content";
+import { heroCopy } from "@/data/content";
 import { isMobileViewport } from "@/lib/mobile";
 
 const HeroCanvas = dynamic(() => import("@/components/canvas/HeroCanvas"), {
@@ -142,35 +142,30 @@ export function Hero() {
           <div className="film-intro-block absolute inset-0 flex flex-col justify-center px-6 pb-10 pt-28 md:justify-between md:px-12 md:pb-14 md:pt-32">
             <div className="pointer-events-auto max-w-xl">
               <p className="film-fade-in mb-4 text-xs font-bold uppercase tracking-[0.35em] text-gold drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)]">
-                {siteConfig.fullName}
+                {heroCopy.eyebrow}
               </p>
               <h1 className="film-fade-in font-[family-name:var(--font-display)] text-[clamp(2.75rem,11vw,6.25rem)] font-extrabold leading-[0.9] tracking-[-0.03em] text-cream drop-shadow-[0_8px_40px_rgba(0,0,0,0.75)]">
-                Stack the
+                {heroCopy.titleLine1}
                 <span className="mt-2 block text-gold drop-shadow-[0_0_40px_rgba(202,138,4,0.45)]">
-                  impossible.
+                  {heroCopy.titleLine2}
                 </span>
               </h1>
               <p className="film-fade-in mt-5 max-w-md text-base font-semibold leading-relaxed text-cream/80 md:text-lg">
-                <span className="md:hidden">
-                  Premium software house — web, mobile, AI, and cloud for ambitious brands.
-                </span>
-                <span className="hidden md:inline">
-                  Multi-stack 3D cinema — SDLC nodes, hash towers, and camera paths that punch through
-                  the screen.
-                </span>
+                <span className="md:hidden">{heroCopy.mobileLead}</span>
+                <span className="hidden md:inline">{heroCopy.desktopLead}</span>
               </p>
               <div className="film-fade-in mt-8 flex flex-wrap gap-3">
                 <Link
                   href="/contact"
                   className="pointer-events-auto inline-flex items-center gap-2 rounded-full bg-gold px-7 py-3.5 text-sm font-extrabold text-black shadow-[0_0_40px_rgba(202,138,4,0.35)] transition hover:brightness-110"
                 >
-                  Start a project <ArrowRight className="h-4 w-4" />
+                  {heroCopy.primaryCta} <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link
                   href="#studio"
                   className="pointer-events-auto inline-flex items-center gap-2 rounded-full border-2 border-cream/25 bg-black/40 px-7 py-3.5 text-sm font-bold text-cream backdrop-blur-md"
                 >
-                  Continue the reel
+                  {heroCopy.secondaryCta}
                 </Link>
               </div>
             </div>
@@ -188,45 +183,51 @@ export function Hero() {
 
           {/* Desktop film acts only */}
           <div className="film-act-2 invisible absolute bottom-28 left-6 hidden max-w-sm opacity-0 md:bottom-36 md:left-12 md:block">
-            <p className="mb-2 text-xs font-bold uppercase tracking-[0.35em] text-gold">Act II</p>
+            <p className="mb-2 text-xs font-bold uppercase tracking-[0.35em] text-gold">
+              {heroCopy.acts[0].label}
+            </p>
             <h2 className="font-[family-name:var(--font-display)] text-3xl font-extrabold tracking-tight text-cream drop-shadow-lg md:text-5xl">
-              Orbit the stacks
+              {heroCopy.acts[0].title}
             </h2>
             <p className="mt-3 text-sm font-medium leading-relaxed text-cream/75 md:text-base">
-              Five towers + SDLC ring — Plan → Design → Build → Test → Deploy → Scale.
+              {heroCopy.acts[0].body}
             </p>
           </div>
 
           <div className="film-act-3 invisible absolute bottom-28 left-6 hidden max-w-sm opacity-0 md:bottom-36 md:left-12 md:block">
-            <p className="mb-2 text-xs font-bold uppercase tracking-[0.35em] text-gold">Act III</p>
+            <p className="mb-2 text-xs font-bold uppercase tracking-[0.35em] text-gold">
+              {heroCopy.acts[1].label}
+            </p>
             <h2 className="font-[family-name:var(--font-display)] text-3xl font-extrabold tracking-tight text-cream drop-shadow-lg md:text-5xl">
-              Punch through
+              {heroCopy.acts[1].title}
             </h2>
             <p className="mt-3 text-sm font-medium leading-relaxed text-cream/75 md:text-base">
-              Camera dives the hash field — objects break the frame like 4D depth.
+              {heroCopy.acts[1].body}
             </p>
           </div>
 
           <div className="film-act-4 invisible absolute bottom-28 left-6 hidden max-w-sm opacity-0 md:bottom-36 md:left-12 md:block">
-            <p className="mb-2 text-xs font-bold uppercase tracking-[0.35em] text-gold">Act IV</p>
+            <p className="mb-2 text-xs font-bold uppercase tracking-[0.35em] text-gold">
+              {heroCopy.acts[2].label}
+            </p>
             <h2 className="font-[family-name:var(--font-display)] text-3xl font-extrabold tracking-tight text-cream drop-shadow-lg md:text-5xl">
-              Ship what lasts
+              {heroCopy.acts[2].title}
             </h2>
             <p className="mt-3 text-sm font-medium leading-relaxed text-cream/75 md:text-base">
-              Sequence resolves. Craft meets product.
+              {heroCopy.acts[2].body}
             </p>
           </div>
 
           <div className="film-end-block invisible absolute inset-x-0 bottom-28 hidden flex-col items-center text-center opacity-0 md:bottom-36 md:flex">
             <p className="text-xs font-bold uppercase tracking-[0.35em] text-gold">End title</p>
             <p className="mt-3 font-[family-name:var(--font-display)] text-3xl font-extrabold text-cream md:text-5xl">
-              Ready when you are.
+              {heroCopy.endTitle}
             </p>
             <Link
               href="/contact"
               className="pointer-events-auto mt-6 inline-flex items-center gap-2 rounded-full bg-gold px-7 py-3.5 text-sm font-extrabold text-black"
             >
-              Book discovery <ArrowRight className="h-4 w-4" />
+              {heroCopy.endCta} <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </div>

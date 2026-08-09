@@ -122,13 +122,13 @@ export function WhyUs() {
       <div className="why-pin mx-auto w-full max-w-7xl px-5 py-24 md:min-h-screen md:px-8 md:py-28">
         <div className="why-intro mb-12 w-full max-w-3xl">
           <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.4em] text-[#ca8a04]">
-            Why us
+            Why Hashstack
           </p>
           <h2 className="font-[family-name:var(--font-display)] text-3xl font-extrabold text-[#faf8f0] md:text-5xl">
-            A pinned cascade of what sets Hashstack apart.
+            Full-service. Modern stack. Built to move fast.
           </h2>
           <p className="mt-3 text-sm text-[#faf8f0]/50 md:text-base">
-            Cards stack with depth as you scroll — each layer owns the frame.
+            Scroll the cascade — each card is a reason clients stop juggling five vendors.
           </p>
         </div>
 

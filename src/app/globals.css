@@ -38,6 +38,25 @@ html {
   }
 }
 
+/* Calculator option list — always scrollable inside the pinned panel */
+.calc-options-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(202, 138, 4, 0.55) rgba(250, 248, 240, 0.06);
+}
+
+.calc-options-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.calc-options-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(202, 138, 4, 0.55);
+}
+
+.calc-options-scroll::-webkit-scrollbar-track {
+  background: rgba(250, 248, 240, 0.06);
+}
+
 html.lenis,
 html.lenis body {
   height: auto;

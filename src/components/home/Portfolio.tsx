@@ -122,12 +122,12 @@ export function Portfolio() {
             Selected work
           </p>
           <h2 className="font-[family-name:var(--font-display)] text-3xl font-extrabold text-[#faf8f0] md:text-5xl">
-            Case studies that explode into the frame.
+            Work across web, apps, brand, and AI.
           </h2>
           <p className="mt-3 max-w-2xl text-sm text-[#faf8f0]/50 md:text-base">
-            <span className="md:hidden">Tap through the work — each case in its own frame.</span>
+            <span className="md:hidden">Tap through selected launches — each case in its own frame.</span>
             <span className="hidden md:inline">
-              Horizontal scroll gallery — mockups surge as each case locks center stage.
+              Horizontal gallery of full-service launches — scroll until a case locks center stage.
             </span>
           </p>
           <div className="mt-6 hidden h-1 max-w-xs overflow-hidden rounded-full bg-[#faf8f0]/10 md:block">

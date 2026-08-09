@@ -11,12 +11,12 @@ const NIGHT_POINTS = [
   {
     icon: Zap,
     title: "Sprint cadence",
-    body: "Weekly demos, clear owners, no black-box weeks.",
+    body: "Weekly demos across web, app, design, and AI — clear owners, no black-box weeks.",
   },
   {
     icon: Shield,
     title: "Production care",
-    body: "Monitoring, hotfixes, and release discipline after launch.",
+    body: "After launch we stay: monitoring, hotfixes, performance, and release discipline.",
   },
   {
     icon: Radio,
@@ -280,10 +280,10 @@ export function DuskTransition() {
             End of day · {siteConfig.location}
           </p>
           <h2 className="font-[family-name:var(--font-display)] text-3xl font-extrabold text-[#1a1510] md:text-5xl">
-            The craft doesn&apos;t clock out.
+            Full-service doesn&apos;t clock out.
           </h2>
           <p className="mx-auto mt-3 max-w-md text-sm text-[#5c4a28] md:text-base">
-            Watch the sun set — then see how we partner after dark.
+            Watch the sun set — then see how we stay with your product after dark.
           </p>
         </div>
 

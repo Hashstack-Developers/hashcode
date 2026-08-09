@@ -263,15 +263,16 @@ export function DawnTransition() {
               About us
             </p>
             <h2 className="font-[family-name:var(--font-display)] text-xl font-extrabold tracking-tight text-[#1a1510] md:text-3xl lg:text-4xl">
-              Day breaks on better software.
+              Day breaks on a full-service team.
             </h2>
             <p className="mt-3 max-w-md text-sm font-medium leading-relaxed text-[#5c4a28] md:mt-4 md:text-base">
-              {siteConfig.description} We blend strategy, immersive frontend, and production
-              engineering for brands that need to look inevitable — and ship on time.
+              {siteConfig.description} Years ago our own site ran on an aging stack and felt slow —
+              we rebuilt it the way we rebuild for clients: modern frameworks, lean delivery, craft
+              that still feels cinematic.
             </p>
             <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-[11px] font-bold uppercase tracking-[0.16em] text-[#8a6a20] md:mt-6 md:text-xs">
-              <span>Web · Mobile · AI</span>
-              <span>Cloud · Design</span>
+              <span>Web · Apps · Design</span>
+              <span>Graphics · Cloud · AI</span>
             </div>
             <Link
               href="/about"

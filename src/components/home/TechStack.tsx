@@ -255,26 +255,26 @@ export function TechStack() {
         {/* Day copy */}
         <div className="tech-intro-day relative z-20 mx-auto w-full max-w-3xl text-center">
           <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.4em] text-[#8a6a20]">
-            Tech stack · daylight
+            Stack · today’s tools
           </p>
           <h2 className="font-[family-name:var(--font-display)] text-3xl font-extrabold text-[#1a1510] md:text-5xl">
-            A living constellation of what we ship with.
+            The frameworks behind our rebuild.
           </h2>
           <p className="mt-3 text-sm text-[#5c4a28] md:text-base">
-            Scroll — day yields to night, then the stack lights the sky.
+            We left the slow legacy stack behind — scroll as day yields to night and the tools appear.
           </p>
         </div>
 
         {/* Night copy */}
         <div className="tech-intro-night absolute left-1/2 top-16 z-20 w-full max-w-3xl -translate-x-1/2 px-5 text-center md:top-20 md:px-8">
           <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.4em] text-[#ca8a04]">
-            Tech stack · under the moon
+            Stack · under the moon
           </p>
           <h2 className="font-[family-name:var(--font-display)] text-3xl font-extrabold text-[#faf8f0] md:text-5xl">
-            Tools lock into orbit.
+            Fast by default. Craft when it counts.
           </h2>
           <p className="mt-3 text-sm text-[#faf8f0]/50 md:text-base">
-            Night sky. Gold constellation. Everything we ship with.
+            Next.js, React, cloud, AI — the same constellation we use for client launches.
           </p>
         </div>
 

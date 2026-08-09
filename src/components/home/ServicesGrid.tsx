@@ -6,6 +6,7 @@ import {
   Cloud,
   Globe,
   Palette,
+  PenTool,
   Smartphone,
   Sparkles,
   ArrowUpRight,
@@ -20,6 +21,7 @@ const icons: Record<string, LucideIcon> = {
   Smartphone,
   Cloud,
   Palette,
+  PenTool,
   Sparkles,
 };
 
@@ -27,10 +29,10 @@ const ALL = [
   ...services,
   {
     id: "custom",
-    title: "Custom stack",
-    subtitle: "Engagement",
+    title: "Full product squads",
+    subtitle: "Retainer · Rebuild",
     description:
-      "We assemble squads for product rebuilds, design systems, and AI launches — fixed scope or retainer.",
+      "Need a rebuild of a slow legacy site, a launch squad, or ongoing care across web, app, and brand? We assemble the team — fixed scope or retainer.",
     icon: "Sparkles",
     accent: "#ca8a04",
   },
@@ -135,13 +137,13 @@ export function ServicesGrid() {
 
         <div className="svc-intro relative z-20 mx-auto w-full max-w-3xl text-center">
           <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.4em] text-[#8a6a20]">
-            Core services · daylight
+            Services · every surface
           </p>
           <h2 className="font-[family-name:var(--font-display)] text-3xl font-extrabold text-[#1a1510] md:text-5xl">
-            Interactive capabilities, not brochure bullets.
+            Whatever your product needs — we deliver it.
           </h2>
           <p className="mt-3 text-sm text-[#5c4a28] md:text-base">
-            Day reel — one delivery track owns the frame at a time.
+            Web, apps, design, graphics, cloud, AI — scroll and each track takes the frame.
           </p>
         </div>
 
