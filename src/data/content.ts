@@ -15,9 +15,94 @@ export const navLinks = [
   { href: "/", label: "Home" },
   { href: "/services", label: "Services" },
   { href: "/work", label: "Work" },
+  { href: "/gallery", label: "Gallery" },
   { href: "/about", label: "About" },
   { href: "/play", label: "Play" },
   { href: "/contact", label: "Contact" },
+];
+
+/** Creative / campaign cards — drop images in /public/gallery and add rows here */
+export type GalleryCard = {
+  id: string;
+  title: string;
+  category: string;
+  description: string;
+  image: string;
+};
+
+export const galleryCards: GalleryCard[] = [
+  {
+    id: "premium-hosting",
+    title: "Premium hosting services",
+    category: "Hosting · Campaign",
+    description:
+      "Improve your website with reliable uptime, security, domains, and 24/7 care — business & e-commerce hosting.",
+    image: "/gallery/premium-hosting.jpg",
+  },
+  {
+    id: "mobile-application",
+    title: "Mobile application developer",
+    category: "Mobile · Campaign",
+    description:
+      "iOS and Android apps built end-to-end — from UI frames to store-ready launches, crafted by Hashstack Developers.",
+    image: "/gallery/mobile-application.jpg",
+  },
+  {
+    id: "video-editing",
+    title: "Video editing",
+    category: "Media · Campaign",
+    description:
+      "Campaign cuts, reels, and motion polish — timeline-ready edits that keep Hashstack brand stories sharp on every screen.",
+    image: "/gallery/video-editing.jpg",
+  },
+  {
+    id: "digital-marketing",
+    title: "Digital marketing services",
+    category: "Marketing · Campaign",
+    description:
+      "Grow with Facebook, Instagram, and Google ads plus full social account handling — strategy that turns attention into sales.",
+    image: "/gallery/digital-marketing.jpg",
+  },
+  {
+    id: "social-media-posts",
+    title: "Social media post designs",
+    category: "Brand · Social",
+    description:
+      "A full feed of food & deal creatives — delivery promos, PSL drops, and saucy lifestyle posts built for scroll-stopping campaigns.",
+    image: "/gallery/social-media-posts.jpg",
+  },
+  {
+    id: "graphic-designing",
+    title: "Graphic designing",
+    category: "Design · Campaign",
+    description:
+      "Logos, flyers, business cards, posts, reels, videos, and brochures — a full graphics kit for brands that need to look sharp everywhere.",
+    image: "/gallery/graphic-designing.jpg",
+  },
+  {
+    id: "content-marketing-strategy",
+    title: "Content marketing strategy",
+    category: "Marketing · Infographic",
+    description:
+      "Tips that matter — document strategy, video, paid promo, email, education, and measure what actually moves the needle.",
+    image: "/gallery/content-marketing-strategy.jpg",
+  },
+  {
+    id: "tech-universe",
+    title: "Join the new universe of technology",
+    category: "Brand · Campaign",
+    description:
+      "Web, apps, games, graphics, digital marketing, and Amazon — the full Hashstack stack on one brand card.",
+    image: "/gallery/tech-universe.jpg",
+  },
+  {
+    id: "it-companies-group",
+    title: "From a well-known group of IT companies",
+    category: "Brand · Campaign",
+    description:
+      "A bold brand statement piece — Hashstack as part of a trusted IT group, built for teams that ship in code.",
+    image: "/gallery/it-companies-group.jpg",
+  },
 ];
 
 export const stats = [
@@ -224,11 +309,28 @@ export const processSteps = [
   },
 ];
 
-export const team = [
-  { name: "Alex Rivera", role: "Creative Director", focus: "Motion · Brand" },
-  { name: "Priya Nair", role: "Head of Engineering", focus: "Platform · Scale" },
-  { name: "Leo Park", role: "3D Lead", focus: "R3F · WebGL" },
-  { name: "Sam Okonkwo", role: "AI Lead", focus: "Agents · MLOps" },
+export type TeamMember = {
+  name: string;
+  role: string;
+  focus: string;
+  image?: string;
+};
+
+export const team: TeamMember[] = [
+  {
+    name: "Mateen Imran",
+    role: "CEO",
+    focus: "Leadership · Product",
+    image: "/team/mateen-imran.jpg",
+  },
+  {
+    name: "Ahsan Naqvi",
+    role: "Engr. Manager",
+    focus: "Engineering · Delivery",
+    image: "/team/ahsan-naqvi.jpg",
+  },
+  { name: "M. Faizan Imran", role: "HR Manager", focus: "People · Culture" },
+  { name: "Eesham Haroon", role: "Project Manager", focus: "Delivery · Clients" },
 ];
 
 export const values = [

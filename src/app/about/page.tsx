@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { aboutStory, team, values } from "@/data/content";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { GlassCard } from "@/components/ui/GlassCard";
@@ -34,7 +35,18 @@ export default function AboutPage() {
               key={member.name}
               className="group p-6 transition duration-500 hover:-translate-y-1 hover:rotate-1"
             >
-              <div className="mb-6 aspect-square rounded-2xl bg-gradient-to-br from-gold/25 to-amber-400/10" />
+              <div className="relative mb-6 aspect-square overflow-hidden rounded-2xl bg-gradient-to-br from-gold/25 to-amber-400/10">
+                {member.image ? (
+                  <Image
+                    src={member.image}
+                    alt={member.name}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                    className="object-cover object-top transition duration-500 group-hover:scale-[1.03]"
+                    priority={member.name === "Mateen Imran"}
+                  />
+                ) : null}
+              </div>
               <h3 className="font-[family-name:var(--font-display)] text-xl text-cream">
                 {member.name}
               </h3>
