@@ -414,7 +414,8 @@ export function Stats() {
           ))}
         </div>
 
-        <div className="absolute inset-x-0 bottom-10 z-20 mx-auto grid max-w-5xl grid-cols-2 gap-3 px-4 md:bottom-14 md:grid-cols-4 md:gap-4 md:px-8">
+        {/* Lift cards on mobile so outro hint has clear air below */}
+        <div className="absolute inset-x-0 bottom-[4.75rem] z-20 mx-auto grid max-w-5xl grid-cols-2 gap-3 px-4 md:bottom-16 md:grid-cols-4 md:gap-4 md:px-8">
           {stats.map((stat, i) => (
             <div
               key={stat.label}
@@ -435,8 +436,9 @@ export function Stats() {
           ))}
         </div>
 
-        <p className="stat-outro pointer-events-none absolute bottom-3 left-1/2 z-20 -translate-x-1/2 text-[9px] font-bold uppercase tracking-[0.3em] text-[#8a6a20] md:bottom-5">
-          Daybreak · scroll into capabilities
+        <p className="stat-outro pointer-events-none absolute bottom-4 left-1/2 z-20 w-[min(92vw,22rem)] -translate-x-1/2 text-center text-[9px] font-bold uppercase leading-relaxed tracking-[0.22em] text-[#8a6a20] md:bottom-5 md:w-auto md:tracking-[0.3em]">
+          <span className="md:hidden">Daybreak · scroll next</span>
+          <span className="hidden md:inline">Daybreak · scroll into capabilities</span>
         </p>
       </div>
     </section>
