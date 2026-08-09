@@ -20,28 +20,57 @@ export function Testimonials() {
 
       const mm = gsap.matchMedia();
 
+      // Mobile: one quote at a time inside 100svh — stacking all cards overflowed into Calculator
       mm.add("(max-width: 767px), (pointer: coarse)", () => {
+        const cards = gsap.utils.toArray<HTMLElement>(".tm-card");
         gsap.set(".tm-intro", { y: 16, autoAlpha: 0 });
-        gsap.set(".tm-card", { autoAlpha: 0, y: 24 });
         gsap.set(".tm-hint", { autoAlpha: 0 });
         gsap.set(".tm-outro", { autoAlpha: 0 });
+        cards.forEach((card) => {
+          gsap.set(card, {
+            autoAlpha: 0,
+            y: 24,
+            position: "absolute",
+            left: "50%",
+            top: "45%",
+            xPercent: -50,
+            yPercent: -50,
+            width: "100%",
+            maxWidth: 380,
+          });
+        });
 
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: root.current,
             start: "top top",
-            end: `+=${pinDistance(180)}%`,
-            scrub: scrubFeel(0.5),
+            end: `+=${pinDistance(160 + testimonials.length * 70, 1)}%`,
+            scrub: scrubFeel(0.55),
             pin: true,
             ...pinExtras(),
           },
         });
 
-        tl.to(".tm-intro", { y: 0, autoAlpha: 1, duration: 0.4, ease: "none" }, 0);
-        gsap.utils.toArray<HTMLElement>(".tm-card").forEach((card, i) => {
-          tl.to(card, { autoAlpha: 1, y: 0, duration: 0.5, ease: "none" }, 0.35 + i * 0.45);
+        tl.to(".tm-intro", { y: 0, autoAlpha: 1, duration: 0.35, ease: "none" }, 0);
+
+        let t = 0.4;
+        cards.forEach((card, i) => {
+          if (i > 0) {
+            tl.to(
+              cards[i - 1],
+              { autoAlpha: 0, y: -20, duration: 0.35, ease: "none" },
+              t,
+            );
+          }
+          tl.to(
+            card,
+            { autoAlpha: 1, y: 0, duration: 0.45, ease: "none" },
+            t + (i > 0 ? 0.1 : 0),
+          );
+          t += 0.95;
         });
-        tl.to(".tm-outro", { autoAlpha: 1, duration: 0.35, ease: "none" }, 1.8);
+
+        tl.to(".tm-outro", { autoAlpha: 1, duration: 0.3, ease: "none" }, t);
       });
 
       mm.add("(min-width: 768px) and (pointer: fine)", () => {
@@ -161,7 +190,7 @@ export function Testimonials() {
       className="relative min-h-[100svh] overflow-hidden bg-[#0a0908]"
       aria-label="Testimonials"
     >
-      <div className="relative flex h-[100svh] flex-col px-5 py-20 md:px-8 md:py-24">
+      <div className="relative flex h-[100svh] flex-col px-5 pb-8 pt-20 md:px-8 md:py-24">
         <div
           className="pointer-events-none absolute left-1/2 top-[55%] h-[45vmin] w-[55vmin] -translate-x-1/2 -translate-y-1/2 rounded-full"
           style={{
@@ -169,36 +198,36 @@ export function Testimonials() {
           }}
         />
 
-        <div className="tm-intro relative z-20 mx-auto w-full max-w-3xl text-center">
+        <div className="tm-intro relative z-20 mx-auto w-full max-w-3xl shrink-0 text-center">
           <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.4em] text-[#ca8a04]">
             Testimonials
           </p>
-          <h2 className="font-[family-name:var(--font-display)] text-3xl font-extrabold text-[#faf8f0] md:text-5xl">
+          <h2 className="font-[family-name:var(--font-display)] text-2xl font-extrabold text-[#faf8f0] md:text-5xl">
             Partners who trusted one team for everything.
           </h2>
-          <p className="mt-3 text-sm text-[#faf8f0]/50 md:text-base">
+          <p className="mt-2 text-sm text-[#faf8f0]/50 md:mt-3 md:text-base">
             Rebuilds, apps, AI, brand — scroll each quote into focus.
           </p>
         </div>
 
         <div
-          className="relative z-10 mx-auto mt-4 flex w-full max-w-5xl flex-1 flex-col items-center gap-3 md:block"
+          className="relative z-10 mx-auto mt-5 w-full max-w-5xl flex-1 md:mt-4 md:block"
           style={{ perspective: "1400px" }}
         >
           {testimonials.map((tm, i) => (
             <article
               key={tm.name}
-              className={`tm-card tm-card-${i} relative w-full max-w-[380px] rounded-3xl border border-[#ca8a04]/35 bg-[#141210]/92 p-6 backdrop-blur-xl md:absolute md:w-[400px] md:p-8`}
+              className={`tm-card tm-card-${i} relative mx-auto w-full max-w-[380px] rounded-3xl border border-[#ca8a04]/35 bg-[#141210]/92 p-5 backdrop-blur-xl md:absolute md:p-8 md:w-[400px]`}
               style={{
                 boxShadow: "0 24px 60px rgba(0,0,0,0.45), 0 0 40px rgba(202,138,4,0.12)",
                 transformStyle: "preserve-3d",
               }}
             >
-              <Quote className="mb-4 h-7 w-7 text-[#ca8a04]" />
-              <p className="text-base leading-relaxed text-[#faf8f0]/80 md:text-lg">
+              <Quote className="mb-3 h-6 w-6 text-[#ca8a04] md:mb-4 md:h-7 md:w-7" />
+              <p className="text-sm leading-relaxed text-[#faf8f0]/80 md:text-lg">
                 &ldquo;{tm.quote}&rdquo;
               </p>
-              <div className="mt-7 border-t border-[#faf8f0]/10 pt-5">
+              <div className="mt-5 border-t border-[#faf8f0]/10 pt-4 md:mt-7 md:pt-5">
                 <p className="font-bold text-[#faf8f0]">{tm.name}</p>
                 <p className="text-sm text-[#faf8f0]/45">{tm.role}</p>
               </div>
@@ -206,10 +235,10 @@ export function Testimonials() {
           ))}
         </div>
 
-        <p className="tm-hint relative z-20 hidden text-center text-[10px] font-bold uppercase tracking-[0.35em] text-[#ca8a04]/65 md:block">
+        <p className="tm-hint relative z-20 hidden shrink-0 text-center text-[10px] font-bold uppercase tracking-[0.35em] text-[#ca8a04]/65 md:block">
           Scroll · next voice
         </p>
-        <p className="tm-outro relative z-20 text-center text-[10px] font-bold uppercase tracking-[0.3em] text-[#ca8a04]/50">
+        <p className="tm-outro relative z-20 mt-3 shrink-0 text-center text-[10px] font-bold uppercase tracking-[0.3em] text-[#ca8a04]/50 md:mt-0">
           Proof parked · estimate next
         </p>
       </div>
