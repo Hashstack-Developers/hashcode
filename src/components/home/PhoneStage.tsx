@@ -320,8 +320,9 @@ export function PhoneStage() {
 
         <div className="relative z-10 shrink-0" style={{ perspective: "1200px" }}>
           <div
-            className="phone-rig relative w-[min(200px,52vw)] will-change-transform md:w-[min(260px,70vw)]"
+            className="phone-rig relative will-change-transform"
             style={{
+              width: "min(260px, 70vw)",
               aspectRatio: "9 / 19.2",
               transformStyle: "preserve-3d",
             }}
