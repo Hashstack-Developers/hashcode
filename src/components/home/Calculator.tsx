@@ -287,23 +287,21 @@ export function Calculator() {
             <div className="mt-6 space-y-0 text-sm">
               {(
                 [
-                  !estimate.needsQuote
-                    ? (["Base", formatMoney(calculatorPricing.basePrice, currency)] as const)
-                    : null,
-                  ["Timeline", estimate.timeline] as const,
-                  ["Type", answers.type ?? "—"] as const,
-                ] as const
-              )
-                .filter((row): row is readonly [string, string] => row != null)
-                .map(([label, value]) => (
-                  <div
-                    key={label}
-                    className="flex items-start justify-between gap-3 border-b border-[#faf8f0]/10 py-3 text-[#faf8f0]/70"
-                  >
-                    <span className="shrink-0">{label}</span>
-                    <span className="text-right text-[#faf8f0]">{value}</span>
-                  </div>
-                ))}
+                  ...(!estimate.needsQuote
+                    ? [["Base", formatMoney(calculatorPricing.basePrice, currency)]]
+                    : []),
+                  ["Timeline", estimate.timeline],
+                  ["Type", answers.type ?? "—"],
+                ] as [string, string][]
+              ).map(([label, value]) => (
+                <div
+                  key={label}
+                  className="flex items-start justify-between gap-3 border-b border-[#faf8f0]/10 py-3 text-[#faf8f0]/70"
+                >
+                  <span className="shrink-0">{label}</span>
+                  <span className="text-right text-[#faf8f0]">{value}</span>
+                </div>
+              ))}
             </div>
           </aside>
         </div>
