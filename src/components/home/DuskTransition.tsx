@@ -36,104 +36,95 @@ export function DuskTransition() {
       registerGsap();
       if (!root.current) return;
 
-      const mm = gsap.matchMedia();
-
-      const buildTimeline = (pin: boolean) => {
-        let navLight = false;
-        const emitNav = (light: boolean) => {
-          if (light === navLight) return;
-          navLight = light;
-          window.dispatchEvent(new CustomEvent("hashstack:dawn-light", { detail: light }));
-        };
-
-        // Start as full day — sun high
-        gsap.set(".dusk-day", { autoAlpha: 1 });
-        gsap.set(".dusk-night", { autoAlpha: 0 });
-        gsap.set(".dusk-stars", { autoAlpha: 0 });
-        gsap.set(".dusk-sun-wrap", { top: "24%", scale: 1.05, autoAlpha: 1 });
-        gsap.set(".dusk-rays", { autoAlpha: 0.75, scale: 1.1 });
-        gsap.set(".dusk-glow", { autoAlpha: 0.9 });
-        gsap.set(".dusk-blush", { autoAlpha: 0.2 });
-        gsap.set(".dusk-moon-wrap", { top: "118%", scale: 0.55, autoAlpha: 0 });
-        gsap.set(".dusk-hint", { autoAlpha: 1 });
-        gsap.set(".dusk-day-copy", { y: 0, autoAlpha: 1 });
-        gsap.set(".dusk-night-copy", { y: 36, autoAlpha: 0 });
-        gsap.set(".dusk-card", { y: 24, autoAlpha: 0 });
-
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: root.current,
-            start: "top top",
-            // Mobile: no pin — taller section scrolls with the page (no nested scrollbar)
-            end: pin ? `+=${pinDistance(320)}%` : `+=${pinDistance(220)}%`,
-            scrub: scrubFeel(0.85),
-            pin,
-            ...(pin ? pinExtras() : {}),
-            onUpdate: (self) => {
-              emitNav(self.isActive && self.progress < 0.48);
-            },
-            onToggle: (self) => {
-              if (!self.isActive) emitNav(false);
-            },
-          },
-        });
-
-        tl.to(".dusk-hint", { autoAlpha: 0.7, duration: 0.45, ease: "none" }, 0);
-
-        tl.to(".dusk-hint", { autoAlpha: 0, duration: 0.35, ease: "none" }, 0.5)
-          .to(".dusk-day-copy", { autoAlpha: 0, y: -16, duration: 0.55, ease: "none" }, 0.55)
-          .to(
-            ".dusk-sun-wrap",
-            { top: "48%", scale: 1.15, duration: 1.2, ease: "none" },
-            0.6,
-          )
-          .to(".dusk-blush", { autoAlpha: 0.85, duration: 1, ease: "none" }, 0.7)
-          .to(".dusk-glow", { autoAlpha: 0.7, duration: 1, ease: "none" }, 0.75)
-          .to(".dusk-rays", { autoAlpha: 0.45, scale: 0.95, duration: 1, ease: "none" }, 0.8);
-
-        tl.to(
-          ".dusk-sun-wrap",
-          { top: "88%", scale: 0.75, duration: 1.35, ease: "none" },
-          1.7,
-        )
-          .to(".dusk-rays", { autoAlpha: 0, duration: 0.8, ease: "none" }, 1.85)
-          .to(".dusk-day", { autoAlpha: 0, duration: 1.5, ease: "none" }, 1.9)
-          .to(".dusk-night", { autoAlpha: 1, duration: 1.5, ease: "none" }, 1.9)
-          .to(".dusk-glow", { autoAlpha: 0.15, duration: 1.2, ease: "none" }, 2.1)
-          .to(".dusk-blush", { autoAlpha: 0.35, duration: 1, ease: "none" }, 2.2)
-          .to(".dusk-stars", { autoAlpha: 1, duration: 1.2, ease: "none" }, 2.35)
-          .to(
-            ".dusk-sun-wrap",
-            { top: "112%", scale: 0.45, autoAlpha: 0.35, duration: 1.1, ease: "none" },
-            2.9,
-          );
-
-        tl.to(
-          ".dusk-moon-wrap",
-          { top: "28%", scale: 1, autoAlpha: 1, duration: 1.5, ease: "none" },
-          3.2,
-        )
-          .to(".dusk-blush", { autoAlpha: 0.12, duration: 0.9, ease: "none" }, 3.4)
-          .to(".dusk-glow", { autoAlpha: 0.35, duration: 1, ease: "none" }, 3.5);
-
-        tl.to(".dusk-night-copy", { y: 0, autoAlpha: 1, duration: 0.8, ease: "none" }, 4.3)
-          .to(
-            ".dusk-card",
-            { y: 0, autoAlpha: 1, stagger: 0.12, duration: 0.65, ease: "none" },
-            4.55,
-          )
-          .to(
-            ".dusk-moon-wrap",
-            { top: "22%", scale: 1.06, duration: 0.95, ease: "none" },
-            5.0,
-          )
-          .to(".dusk-stars", { autoAlpha: 1, duration: 0.9, ease: "none" }, 5.4);
+      let navLight = false;
+      const emitNav = (light: boolean) => {
+        if (light === navLight) return;
+        navLight = light;
+        window.dispatchEvent(new CustomEvent("hashstack:dawn-light", { detail: light }));
       };
 
-      mm.add("(max-width: 767px)", () => buildTimeline(false));
-      mm.add("(min-width: 768px)", () => buildTimeline(true));
+      // Start as full day — sun high
+      gsap.set(".dusk-day", { autoAlpha: 1 });
+      gsap.set(".dusk-night", { autoAlpha: 0 });
+      gsap.set(".dusk-stars", { autoAlpha: 0 });
+      gsap.set(".dusk-sun-wrap", { top: "24%", scale: 1.05, autoAlpha: 1 });
+      gsap.set(".dusk-rays", { autoAlpha: 0.75, scale: 1.1 });
+      gsap.set(".dusk-glow", { autoAlpha: 0.9 });
+      gsap.set(".dusk-blush", { autoAlpha: 0.2 });
+      gsap.set(".dusk-moon-wrap", { top: "118%", scale: 0.55, autoAlpha: 0 });
+      gsap.set(".dusk-hint", { autoAlpha: 1 });
+      gsap.set(".dusk-day-copy", { y: 0, autoAlpha: 1 });
+      gsap.set(".dusk-night-copy", { y: 36, autoAlpha: 0 });
+      gsap.set(".dusk-card", { y: 24, autoAlpha: 0 });
 
-      return () => mm.revert();
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: root.current,
+          start: "top top",
+          // Longer pin on mobile so the screen holds through day → night
+          end: `+=${pinDistance(320, 1.05)}%`,
+          scrub: scrubFeel(0.85),
+          pin: true,
+          ...pinExtras(),
+          onUpdate: (self) => {
+            emitNav(self.isActive && self.progress < 0.48);
+          },
+          onToggle: (self) => {
+            if (!self.isActive) emitNav(false);
+          },
+        },
+      });
+
+      tl.to(".dusk-hint", { autoAlpha: 0.7, duration: 0.45, ease: "none" }, 0);
+
+      tl.to(".dusk-hint", { autoAlpha: 0, duration: 0.35, ease: "none" }, 0.5)
+        .to(".dusk-day-copy", { autoAlpha: 0, y: -16, duration: 0.55, ease: "none" }, 0.55)
+        .to(
+          ".dusk-sun-wrap",
+          { top: "48%", scale: 1.15, duration: 1.2, ease: "none" },
+          0.6,
+        )
+        .to(".dusk-blush", { autoAlpha: 0.85, duration: 1, ease: "none" }, 0.7)
+        .to(".dusk-glow", { autoAlpha: 0.7, duration: 1, ease: "none" }, 0.75)
+        .to(".dusk-rays", { autoAlpha: 0.45, scale: 0.95, duration: 1, ease: "none" }, 0.8);
+
+      tl.to(
+        ".dusk-sun-wrap",
+        { top: "88%", scale: 0.75, duration: 1.35, ease: "none" },
+        1.7,
+      )
+        .to(".dusk-rays", { autoAlpha: 0, duration: 0.8, ease: "none" }, 1.85)
+        .to(".dusk-day", { autoAlpha: 0, duration: 1.5, ease: "none" }, 1.9)
+        .to(".dusk-night", { autoAlpha: 1, duration: 1.5, ease: "none" }, 1.9)
+        .to(".dusk-glow", { autoAlpha: 0.15, duration: 1.2, ease: "none" }, 2.1)
+        .to(".dusk-blush", { autoAlpha: 0.35, duration: 1, ease: "none" }, 2.2)
+        .to(".dusk-stars", { autoAlpha: 1, duration: 1.2, ease: "none" }, 2.35)
+        .to(
+          ".dusk-sun-wrap",
+          { top: "112%", scale: 0.45, autoAlpha: 0.35, duration: 1.1, ease: "none" },
+          2.9,
+        );
+
+      tl.to(
+        ".dusk-moon-wrap",
+        { top: "28%", scale: 1, autoAlpha: 1, duration: 1.5, ease: "none" },
+        3.2,
+      )
+        .to(".dusk-blush", { autoAlpha: 0.12, duration: 0.9, ease: "none" }, 3.4)
+        .to(".dusk-glow", { autoAlpha: 0.35, duration: 1, ease: "none" }, 3.5);
+
+      tl.to(".dusk-night-copy", { y: 0, autoAlpha: 1, duration: 0.8, ease: "none" }, 4.3)
+        .to(
+          ".dusk-card",
+          { y: 0, autoAlpha: 1, stagger: 0.12, duration: 0.65, ease: "none" },
+          4.55,
+        )
+        .to(
+          ".dusk-moon-wrap",
+          { top: "22%", scale: 1.06, duration: 0.95, ease: "none" },
+          5.0,
+        )
+        .to(".dusk-stars", { autoAlpha: 1, duration: 0.9, ease: "none" }, 5.4);
     },
     { scope: root },
   );
@@ -142,11 +133,11 @@ export function DuskTransition() {
     <section
       id="after-dark"
       ref={root}
-      className="relative min-h-[100svh] overflow-hidden md:min-h-[100svh]"
+      className="relative min-h-[100svh] overflow-hidden"
       aria-label="Hashstack after dark — how we partner"
     >
-      {/* Mobile: taller stage so night cards fit without nested scroll */}
-      <div className="relative min-h-[125svh] w-full overflow-hidden md:h-[100svh] md:min-h-0">
+      {/* Pinned 100svh stage on all screens — mobile content is compacted (no nested scroll) */}
+      <div className="relative h-[100svh] w-full overflow-hidden">
         {/* Day sky */}
         <div
           className="dusk-day absolute inset-0"
@@ -292,52 +283,54 @@ export function DuskTransition() {
           </p>
         </div>
 
-        {/* Night info — no nested scroll; mobile stage is taller so cards fit in main scroll */}
-        <div className="dusk-night-copy pointer-events-none absolute inset-0 z-30 mx-auto flex max-w-6xl flex-col justify-start overflow-visible px-5 pb-10 pt-[5.25rem] md:justify-center md:px-10 md:pb-[24vh] md:pt-28">
-          <div className="mb-3 flex items-center gap-3 md:mb-10">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#ca8a04]/40 bg-[#ca8a04]/10 md:h-10 md:w-10">
+        {/* Night info — pinned viewport; compact on mobile so no nested scrollbar */}
+        <div className="dusk-night-copy pointer-events-none absolute inset-0 z-30 mx-auto flex max-w-6xl flex-col justify-start overflow-hidden px-5 pb-[14vh] pt-[4.75rem] md:justify-center md:overflow-visible md:px-10 md:pb-[24vh] md:pt-28">
+          <div className="mb-2.5 flex items-center gap-2.5 md:mb-10 md:gap-3">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#ca8a04]/40 bg-[#ca8a04]/10 md:h-10 md:w-10">
               <Moon className="h-4 w-4 text-[#f5d76e] md:h-5 md:w-5" />
             </span>
             <div className="min-w-0">
-              <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-[#ca8a04]">
+              <p className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#ca8a04] md:text-[10px] md:tracking-[0.35em]">
                 After dark · partnership
               </p>
-              <h2 className="font-[family-name:var(--font-display)] text-xl font-extrabold leading-tight text-[#faf8f0] sm:text-2xl md:text-4xl">
+              <h2 className="font-[family-name:var(--font-display)] text-lg font-extrabold leading-tight text-[#faf8f0] sm:text-xl md:text-4xl">
                 How we stay with you.
               </h2>
             </div>
           </div>
 
-          <div className="grid gap-2.5 md:grid-cols-3 md:gap-5">
+          <div className="grid gap-2 md:grid-cols-3 md:gap-5">
             {NIGHT_POINTS.map((item) => (
               <div
                 key={item.title}
-                className="dusk-card rounded-2xl border border-[#ca8a04]/25 bg-[#141210]/75 p-3.5 backdrop-blur-sm md:p-6"
+                className="dusk-card rounded-xl border border-[#ca8a04]/25 bg-[#141210]/75 p-3 backdrop-blur-sm md:rounded-2xl md:p-6"
               >
-                <item.icon className="mb-2 h-5 w-5 text-[#ca8a04] md:mb-3 md:h-6 md:w-6" />
-                <p className="font-[family-name:var(--font-display)] text-base font-bold text-[#faf8f0] md:text-lg">
+                <item.icon className="mb-1.5 h-4 w-4 text-[#ca8a04] md:mb-3 md:h-6 md:w-6" />
+                <p className="font-[family-name:var(--font-display)] text-sm font-bold text-[#faf8f0] md:text-lg">
                   {item.title}
                 </p>
-                <p className="mt-1 text-sm leading-snug text-[#faf8f0]/65 md:mt-2 md:leading-relaxed">
+                <p className="mt-0.5 text-[12px] leading-snug text-[#faf8f0]/65 md:mt-2 md:text-sm md:leading-relaxed">
                   {item.body}
                 </p>
               </div>
             ))}
           </div>
 
-          <div className="dusk-card pointer-events-auto mt-3 flex flex-col items-start gap-3 rounded-2xl border border-[#ca8a04]/30 bg-[#0a0908]/80 p-3.5 md:mt-8 md:flex-row md:items-center md:justify-between md:gap-4 md:p-6">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#ca8a04]">
+          <div className="dusk-card pointer-events-auto mt-2 flex flex-col items-start gap-2.5 rounded-xl border border-[#ca8a04]/30 bg-[#0a0908]/80 p-3 md:mt-8 md:flex-row md:items-center md:justify-between md:gap-4 md:rounded-2xl md:p-6">
+            <div className="min-w-0">
+              <p className="text-[9px] font-bold uppercase tracking-[0.28em] text-[#ca8a04] md:text-[10px] md:tracking-[0.3em]">
                 Ready when you are
               </p>
-              <p className="mt-1 font-[family-name:var(--font-display)] text-lg font-bold text-[#faf8f0] md:text-2xl">
+              <p className="mt-0.5 font-[family-name:var(--font-display)] text-base font-bold text-[#faf8f0] md:mt-1 md:text-2xl">
                 Brief us. We ship through the night.
               </p>
-              <p className="mt-1 text-sm text-[#faf8f0]/55">{siteConfig.email}</p>
+              <p className="mt-0.5 truncate text-xs text-[#faf8f0]/55 md:mt-1 md:text-sm">
+                {siteConfig.email}
+              </p>
             </div>
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 rounded-full border-2 border-[#ca8a04]/60 bg-[#ca8a04]/15 px-6 py-3 text-sm font-extrabold text-[#faf8f0] transition hover:border-[#ca8a04] hover:bg-[#ca8a04]/25"
+              className="inline-flex shrink-0 items-center gap-2 rounded-full border-2 border-[#ca8a04]/60 bg-[#ca8a04]/15 px-5 py-2.5 text-sm font-extrabold text-[#faf8f0] transition hover:border-[#ca8a04] hover:bg-[#ca8a04]/25 md:px-6 md:py-3"
             >
               Start a project
               <ArrowUpRight className="h-4 w-4 text-[#ca8a04]" />
