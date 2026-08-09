@@ -147,7 +147,7 @@ export function ServicesGrid() {
           </p>
         </div>
 
-        <div className="relative z-10 mx-auto mt-8 flex w-full max-w-2xl flex-1 items-center md:mt-10">
+        <div className="relative z-10 mx-auto mt-8 flex w-full max-w-2xl flex-1 items-center pb-6 md:mt-10 md:pb-10">
           {ALL.map((service, i) => {
             const Icon = icons[service.icon] ?? Globe;
             const isCustom = service.id === "custom";
@@ -196,7 +196,7 @@ export function ServicesGrid() {
           })}
         </div>
 
-        <div className="relative z-20 mx-auto mt-auto w-full max-w-2xl pb-2">
+        <div className="relative z-20 mx-auto mt-auto w-full max-w-2xl pt-2 pb-5 md:pt-4 md:pb-3">
           <div className="h-1.5 overflow-hidden rounded-full bg-[#1a1510]/10">
             <div className="svc-progress-fill h-full origin-left rounded-full bg-[#ca8a04]" />
           </div>
