@@ -147,65 +147,68 @@ export function ServicesGrid() {
           </p>
         </div>
 
-        <div className="relative z-10 mx-auto mt-8 flex w-full max-w-2xl flex-1 items-center pb-12 md:mt-10 md:pb-20">
-          {ALL.map((service, i) => {
-            const Icon = icons[service.icon] ?? Globe;
-            const isCustom = service.id === "custom";
-            return (
-              <div
-                key={service.id}
-                className={`svc-slide svc-slide-${i} absolute inset-x-0 mx-auto w-full`}
-              >
+        {/* Card + progress grouped — line sits ~20–24px under the box, same width */}
+        <div className="relative z-10 mx-auto mt-6 flex w-full max-w-2xl flex-1 flex-col justify-center md:mt-8">
+          <div className="relative grid w-full">
+            {ALL.map((service, i) => {
+              const Icon = icons[service.icon] ?? Globe;
+              const isCustom = service.id === "custom";
+              return (
                 <div
-                  className="rounded-3xl border-2 border-[#ca8a04]/50 bg-[#faf8f0]/95 p-7 backdrop-blur-xl md:p-10"
-                  style={{
-                    boxShadow:
-                      "0 24px 60px rgba(80,50,10,0.12), 0 0 40px rgba(202,138,4,0.15)",
-                  }}
+                  key={service.id}
+                  className={`svc-slide svc-slide-${i} col-start-1 row-start-1 w-full`}
                 >
-                  <div className="mb-6 flex items-center justify-between">
-                    <div
-                      className="flex h-14 w-14 items-center justify-center rounded-2xl border border-[#ca8a04]/45 bg-[#ca8a04]/10"
-                      style={{ boxShadow: `0 0 28px ${service.accent}44` }}
-                    >
-                      <Icon className="h-6 w-6 text-[#ca8a04]" />
-                    </div>
-                    <span className="font-mono text-sm text-[#8a6a20]">
-                      0{i + 1} / 0{ALL.length}
-                    </span>
-                  </div>
-                  <p className="text-xs font-bold uppercase tracking-[0.25em] text-[#8a6a20]">
-                    {service.subtitle}
-                  </p>
-                  <h3 className="mt-2 font-[family-name:var(--font-display)] text-3xl font-extrabold text-[#1a1510] md:text-4xl">
-                    {service.title}
-                  </h3>
-                  <p className="mt-4 max-w-lg text-sm leading-relaxed text-[#5c4a28] md:text-base">
-                    {service.description}
-                  </p>
-                  <Link
-                    href={isCustom ? "/contact" : "/services"}
-                    className="mt-7 inline-flex items-center gap-2 rounded-full border-2 border-[#ca8a04]/50 bg-[#1a1510] px-5 py-2.5 text-sm font-bold text-[#faf8f0] transition hover:border-[#ca8a04] hover:bg-[#2a241c]"
+                  <div
+                    className="rounded-3xl border-2 border-[#ca8a04]/50 bg-[#faf8f0]/95 p-6 backdrop-blur-xl md:p-10"
+                    style={{
+                      boxShadow:
+                        "0 24px 60px rgba(80,50,10,0.12), 0 0 40px rgba(202,138,4,0.15)",
+                    }}
                   >
-                    {isCustom ? "Talk to us" : "Explore track"}
-                    <ArrowUpRight className="h-4 w-4 text-[#ca8a04]" />
-                  </Link>
+                    <div className="mb-4 flex items-center justify-between md:mb-6">
+                      <div
+                        className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[#ca8a04]/45 bg-[#ca8a04]/10 md:h-14 md:w-14"
+                        style={{ boxShadow: `0 0 28px ${service.accent}44` }}
+                      >
+                        <Icon className="h-5 w-5 text-[#ca8a04] md:h-6 md:w-6" />
+                      </div>
+                      <span className="font-mono text-sm text-[#8a6a20]">
+                        0{i + 1} / 0{ALL.length}
+                      </span>
+                    </div>
+                    <p className="text-xs font-bold uppercase tracking-[0.25em] text-[#8a6a20]">
+                      {service.subtitle}
+                    </p>
+                    <h3 className="mt-2 font-[family-name:var(--font-display)] text-2xl font-extrabold text-[#1a1510] md:text-4xl">
+                      {service.title}
+                    </h3>
+                    <p className="mt-3 max-w-lg text-sm leading-relaxed text-[#5c4a28] md:mt-4 md:text-base">
+                      {service.description}
+                    </p>
+                    <Link
+                      href={isCustom ? "/contact" : "/services"}
+                      className="mt-5 inline-flex items-center gap-2 rounded-full border-2 border-[#ca8a04]/50 bg-[#1a1510] px-5 py-2.5 text-sm font-bold text-[#faf8f0] transition hover:border-[#ca8a04] hover:bg-[#2a241c] md:mt-7"
+                    >
+                      {isCustom ? "Talk to us" : "Explore track"}
+                      <ArrowUpRight className="h-4 w-4 text-[#ca8a04]" />
+                    </Link>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="relative z-20 mx-auto mt-auto w-full max-w-2xl pt-4 pb-6 md:pt-8 md:pb-4">
-          <div className="h-1.5 overflow-hidden rounded-full bg-[#1a1510]/10">
-            <div className="svc-progress-fill h-full origin-left rounded-full bg-[#ca8a04]" />
+              );
+            })}
           </div>
-          <p className="svc-hint mt-3 text-center text-[10px] font-bold uppercase tracking-[0.35em] text-[#8a6a20]">
-            Scroll · next capability
-          </p>
-          <p className="svc-outro mt-2 text-center text-[10px] font-bold uppercase tracking-[0.3em] text-[#8a6a20]/70">
-            Tracks locked · keep scrolling
-          </p>
+
+          <div className="relative z-20 mt-5 w-full shrink-0 md:mt-6">
+            <div className="h-1.5 overflow-hidden rounded-full bg-[#1a1510]/10">
+              <div className="svc-progress-fill h-full origin-left rounded-full bg-[#ca8a04]" />
+            </div>
+            <p className="svc-hint mt-2.5 text-center text-[10px] font-bold uppercase tracking-[0.35em] text-[#8a6a20]">
+              Scroll · next capability
+            </p>
+            <p className="svc-outro mt-1.5 text-center text-[10px] font-bold uppercase tracking-[0.3em] text-[#8a6a20]/70">
+              Tracks locked · keep scrolling
+            </p>
+          </div>
         </div>
       </div>
     </section>
